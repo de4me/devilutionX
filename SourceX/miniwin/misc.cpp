@@ -7,6 +7,7 @@
 #include "controls/controller.h"
 #include "DiabloUI/diabloui.h"
 #include "DiabloUI/dialogs.h"
+#include "pref.h"
 
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
@@ -135,12 +136,9 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 
 	InitController();
 
-	int upscale = 1;
-	DvlIntSetting("upscale", &upscale);
-	DvlIntSetting("fullscreen", (int *)&fullscreen);
-
-	int grabInput = 1;
-	DvlIntSetting("grab input", &grabInput);
+	bool upscale = PrefGetBool("upscale", true);
+	fullscreen = PrefGetBool("fullscreen", fullscreen);
+	bool grabInput = PrefGetBool("grab input", true);
 
 #ifdef USE_SDL1
 	int flags = SDL_SWSURFACE | SDL_HWPALETTE;
@@ -168,8 +166,8 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 	if (upscale) {
 		flags |= fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_RESIZABLE;
 
-		char scaleQuality[2] = "2";
-		DvlStringSetting("scaling quality", scaleQuality, 2);
+		char buffer[2];
+		const char* scaleQuality = PrefGetString("scaling quality", &buffer[0], sizeof(buffer), "2");
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scaleQuality);
 	} else if (fullscreen) {
 		flags |= SDL_WINDOW_FULLSCREEN;
