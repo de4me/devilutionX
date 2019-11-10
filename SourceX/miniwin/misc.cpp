@@ -136,9 +136,9 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 
 	InitController();
 
-	bool upscale = PrefGetBool("upscale", true);
-	fullscreen = PrefGetBool("fullscreen", fullscreen);
-	bool grabInput = PrefGetBool("grab input", true);
+	bool upscale = PrefGetBool(kPrefUpscale, true);
+	fullscreen = PrefGetBool(kPrefFullscreen, fullscreen);
+	bool grabInput = PrefGetBool(kPrefGrabInput, true);
 
 #ifdef USE_SDL1
 	int flags = SDL_SWSURFACE | SDL_HWPALETTE;
@@ -176,8 +176,9 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 	if (grabInput) {
 		flags |= SDL_WINDOW_INPUT_GRABBED;
 	}
-
-	window = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight, flags);
+	
+	SDL_Rect frame = PrefGetRect(kPrefWindowFrame, {SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight});
+	window = SDL_CreateWindow(lpWindowName, frame.x, frame.y, frame.w, frame.h, flags);
 #endif
 	if (window == NULL) {
 		ErrSdl();

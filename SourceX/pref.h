@@ -2,6 +2,12 @@
 
 namespace dvl {
 
+extern const char* kPrefWindowFrame;
+extern const char* kPrefWindowFrame;
+extern const char* kPrefUpscale;
+extern const char* kPrefFullscreen;
+extern const char* kPrefGrabInput;
+
 /**
 Sets bool for a given value name.
 @param valuename Value name
@@ -51,5 +57,21 @@ Gets int for a given value name, or the default specified if the key does not ex
 @return If value not exist or invalid then return defaultValue
  */
 int PrefGetInt(const char* valuename, int defaultValue);
+
+/**
+Sets SDL_Rect for a given value name.
+@param valuename Value name
+@param newValue New value
+@return False on failure
+*/
+bool PrefSetRect(const char* valuename, const SDL_Rect newValue);
+
+/**
+Gets SDL_Rect for a given value name, or the default specified if the key does not exist.
+@param valuename Value name
+@param defaultValue Default
+@return If value not exist or invalid then return defaultValue
+ */
+SDL_Rect PrefGetRect(const char* valuename, const SDL_Rect defaultValue);
 
 }

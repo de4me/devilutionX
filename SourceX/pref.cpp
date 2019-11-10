@@ -11,6 +11,11 @@ namespace dvl {
 const char* keyname = "devilutionx";
 #endif
 
+const char* kPrefWindowFrame = "window_frame";
+const char* kPrefUpscale = "upscale";
+const char* kPrefFullscreen = "fullscreen";
+const char* kPrefGrabInput = "grab input";
+
 bool PrefSetBool(const char* valuename, bool newValue){
 #ifdef __APPLE__
 	StringObject cf_key(valuename);
@@ -83,6 +88,20 @@ int PrefGetInt(const char* valuename, int defaultValue){
 	int value;
 	return SRegLoadValue(keyname, valuename, 0, &value) ? value : defaultValue;
 #endif
+}
+
+bool PrefSetRect(const char* valuename, const SDL_Rect newValue){
+	char buffer[64];
+	snprintf(buffer, sizeof(buffer), "%i,%i,%i,%i", newValue.x, newValue.y, newValue.w, newValue.h);
+	return PrefSetString(valuename, buffer);
+}
+
+SDL_Rect PrefGetRect(const char* valuename, const SDL_Rect defaultValue){
+	char buffer[64];
+	const char* buffer_ptr = PrefGetString(valuename, buffer, sizeof(buffer), NULL);
+	if(buffer_ptr == NULL) return defaultValue;
+	SDL_Rect rect;
+	return sscanf(buffer_ptr, "%i,%i,%i,%i", &rect.x, &rect.y, &rect.w, &rect.h) == 4 ? rect : defaultValue;
 }
 
 }

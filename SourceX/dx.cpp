@@ -3,6 +3,7 @@
 #include "miniwin/ddraw.h"
 #include "miniwin/com_macro.h"
 #include <SDL.h>
+#include "pref.h"
 
 namespace dvl {
 
@@ -29,6 +30,17 @@ SDL_Surface *renderer_texture_surface = nullptr;
 SDL_Surface *pal_surface;
 
 bool bufferUpdated = false;
+
+void SaveWindow(){
+	if(window == NULL) return;
+	Uint32 flags = SDL_GetWindowFlags(window);
+	if(flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_MAXIMIZED))
+		return;
+	SDL_Rect frame;
+	SDL_GetWindowSize(window, &frame.w, &frame.h);
+	SDL_GetWindowPosition(window, &frame.x, &frame.y);
+	PrefSetRect(kPrefWindowFrame, frame);
+}
 
 static void dx_create_back_buffer()
 {
@@ -127,6 +139,7 @@ void dx_cleanup()
 	sgdwLockCount = 0;
 	gpBuffer = NULL;
 	sgMemCrit.Leave();
+	SaveWindow();
 
 	if (pal_surface == nullptr)
 		return;
