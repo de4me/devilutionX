@@ -47,6 +47,7 @@
 
 #define VOLUME_MIN				-1600
 #define VOLUME_MAX				0
+#define VOLUME_NORMAL			-1100
 
 // todo: enums
 #define NUMLEVELS				17

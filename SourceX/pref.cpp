@@ -11,6 +11,9 @@ namespace dvl {
 const char* keyname = "devilutionx";
 #endif
 
+const char* kPrefSoundVolume = "sound_volume";
+const char* kPrefMusicVolume = "music_volume";
+
 bool PrefSetBool(const char* valuename, bool newValue){
 #ifdef __APPLE__
 	StringObject cf_key(valuename);

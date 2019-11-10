@@ -2,6 +2,9 @@
 
 namespace dvl {
 
+extern const char* kPrefSoundVolume;
+extern const char* kPrefMusicVolume;
+
 /**
 Sets bool for a given value name.
 @param valuename Value name
