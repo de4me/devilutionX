@@ -136,7 +136,7 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 
 	bool upscale = PrefGetBool(kPrefUpscale, true);
 	fullscreen = PrefGetBool(kPrefFullscreen, false);
-	bool grabInput = PrefGetBool(kPrefGrabInput, true);
+	bool grabInput = PrefGetBool(kPrefGrabInput, false);
 
 #ifdef USE_SDL1
 	int flags = SDL_SWSURFACE | SDL_HWPALETTE;
