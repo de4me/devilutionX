@@ -15,6 +15,8 @@ const char* kPrefWindowFrame = "window_frame";
 const char* kPrefUpscale = "upscale";
 const char* kPrefFullscreen = "fullscreen";
 const char* kPrefGrabInput = "grab input";
+const char* kPrefSoundVolume = "sound_volume";
+const char* kPrefMusicVolume = "music_volume";
 
 bool PrefSetBool(const char* valuename, bool newValue){
 #ifdef __APPLE__

@@ -3,6 +3,7 @@
 #include "stubs.h"
 #include <SDL.h>
 #include <SDL_mixer.h>
+#include "pref.h"
 
 namespace dvl {
 
@@ -123,12 +124,23 @@ void sound_file_cleanup(TSnd *sound_file)
 	}
 }
 
+int NormilizeVolume(int volume){
+	if(volume>0) return VOLUME_NORMAL;
+	if(volume<VOLUME_MIN) return VOLUME_MIN;
+	return volume;
+}
+
+int SoundVolume(const char *value_name){
+	int result = NormilizeVolume(PrefGetInt(value_name, VOLUME_NORMAL));
+	return result - result % 100;
+}
+
 void snd_init(HWND hWnd)
 {
-	sound_load_volume("Sound Volume", &sglSoundVolume);
+	sglSoundVolume = SoundVolume(kPrefSoundVolume);
 	gbSoundOn = sglSoundVolume > VOLUME_MIN;
 
-	sound_load_volume("Music Volume", &sglMusicVolume);
+	sglMusicVolume = SoundVolume(kPrefMusicVolume);
 	gbMusicOn = sglMusicVolume > VOLUME_MIN;
 
 	int result = Mix_OpenAudio(22050, AUDIO_S16LSB, 2, 1024);
@@ -143,18 +155,8 @@ void snd_init(HWND hWnd)
 
 void sound_load_volume(char *value_name, int *value)
 {
-	int v = *value;
-	if (!SRegLoadValue("Diablo", value_name, 0, &v)) {
-		v = VOLUME_MAX;
-	}
-	*value = v;
-
-	if (*value < VOLUME_MIN) {
-		*value = VOLUME_MIN;
-	} else if (*value > VOLUME_MAX) {
-		*value = VOLUME_MAX;
-	}
-	*value -= *value % 100;
+	if(value==NULL) return;
+	*value = SoundVolume(value_name);
 }
 
 void sound_cleanup()
@@ -163,14 +165,9 @@ void sound_cleanup()
 
 	if (gbSndInited) {
 		gbSndInited = false;
-		sound_store_volume("Sound Volume", sglSoundVolume);
-		sound_store_volume("Music Volume", sglMusicVolume);
+		PrefSetInt(kPrefSoundVolume, sglSoundVolume);
+		PrefSetInt(kPrefMusicVolume, sglMusicVolume);
 	}
-}
-
-void sound_store_volume(char *key, int value)
-{
-	SRegSaveValue("Diablo", key, 0, value);
 }
 
 void music_stop()
