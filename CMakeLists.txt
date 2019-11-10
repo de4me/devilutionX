@@ -108,6 +108,17 @@ else()
   find_package(SDL2_mixer REQUIRED)
 endif()
 
+if(USE_SDL1)
+  set(EXTRA_LIBS ${SDL_LIBRARY} ${SDL_TTF_LIBRARY} ${SDL_MIXER_LIBRARY})
+else()
+  set(EXTRA_LIBS SDL2::SDL2main SDL2::SDL2_ttf SDL2::SDL2_mixer)
+endif()
+
+if(APPLE)
+  find_library(CORE_FOUNDATION CoreFoundation)
+  set(EXTRA_LIBS ${CORE_FOUNDATION} ${EXTRA_LIBS})
+endif()
+
 add_library(smacker STATIC
   3rdParty/libsmacker/smk_bitstream.c
   3rdParty/libsmacker/smk_hufftree.c
@@ -253,6 +264,7 @@ set(devilutionx_SRCS
   SourceX/DiabloUI/title.cpp
   SourceX/DiabloUI/ttf_render_wrapped.cpp
   SourceX/main.cpp
+  SourceX/pref.cpp
   ./Packaging/macOS/AppIcon.icns
   ./Packaging/resources/CharisSILB.ttf)
 
@@ -357,15 +369,9 @@ foreach(
 endforeach(def_name)
 
 foreach(target devilution devilutionx)
+  target_link_libraries(${target} PRIVATE ${EXTRA_LIBS})
   if(USE_SDL1)
-    target_link_libraries(${target} PRIVATE
-      ${SDL_LIBRARY} ${SDL_TTF_LIBRARY} ${SDL_MIXER_LIBRARY})
     target_compile_definitions(${target} PRIVATE USE_SDL1)
-  else()
-    target_link_libraries(${target} PRIVATE
-      SDL2::SDL2main
-      SDL2::SDL2_ttf
-      SDL2::SDL2_mixer)
   endif()
 
   if(ASAN)

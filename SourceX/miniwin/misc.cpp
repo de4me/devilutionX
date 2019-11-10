@@ -7,6 +7,7 @@
 #include "controls/controller.h"
 #include "DiabloUI/diabloui.h"
 #include "DiabloUI/dialogs.h"
+#include "pref.h"
 
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
@@ -133,12 +134,9 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 
 	InitController();
 
-	int upscale = 1;
-	DvlIntSetting("upscale", &upscale);
-	DvlIntSetting("fullscreen", (int *)&fullscreen);
-
-	int grabInput = 1;
-	DvlIntSetting("grab input", &grabInput);
+	bool upscale = PrefGetBool(kPrefUpscale, true);
+	fullscreen = PrefGetBool(kPrefFullscreen, fullscreen);
+	bool grabInput = PrefGetBool(kPrefGrabInput, true);
 
 #ifdef USE_SDL1
 	int flags = SDL_SWSURFACE | SDL_HWPALETTE;
@@ -166,8 +164,8 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 	if (upscale) {
 		flags |= fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_RESIZABLE;
 
-		char scaleQuality[2] = "2";
-		DvlStringSetting("scaling quality", scaleQuality, 2);
+		char buffer[2];
+		const char* scaleQuality = PrefGetString("scaling quality", &buffer[0], sizeof(buffer), "2");
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scaleQuality);
 	} else if (fullscreen) {
 		flags |= SDL_WINDOW_FULLSCREEN;
@@ -176,8 +174,9 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 	if (grabInput) {
 		flags |= SDL_WINDOW_INPUT_GRABBED;
 	}
-
-	window = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight, flags);
+	
+	SDL_Rect frame = PrefGetRect(kPrefWindowFrame, {SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight});
+	window = SDL_CreateWindow(lpWindowName, frame.x, frame.y, frame.w, frame.h, flags);
 #endif
 	if (window == NULL) {
 		ErrSdl();
