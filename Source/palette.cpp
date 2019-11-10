@@ -13,41 +13,11 @@ int gdwPalEntries;
 int gamma_correction = 100;
 BOOL color_cycling_enabled = TRUE;
 BOOLEAN sgbFadedIn = TRUE;
-BOOLEAN is_gamma_valid = FALSE;
-
-void SaveGamma()
-{
-	if( !is_gamma_valid ) return;
-	SRegSaveValue("Diablo", "Gamma Correction", 0, gamma_correction);
-	SRegSaveValue("Diablo", "Color Cycling", FALSE, color_cycling_enabled);
-}
 
 void palette_init()
 {
-	LoadGamma();
 	memcpy(system_palette, orig_palette, sizeof(orig_palette));
 	CreatePalette();
-}
-
-void LoadGamma()
-{
-	int gamma_value;
-	int value;
-
-	value = gamma_correction;
-	if (!SRegLoadValue("Diablo", "Gamma Correction", 0, &value))
-		value = 100;
-	gamma_value = value;
-	if (value < 30) {
-		gamma_value = 30;
-	} else if (value > 100) {
-		gamma_value = 100;
-	}
-	gamma_correction = gamma_value - gamma_value % 5;
-	if (!SRegLoadValue("Diablo", "Color Cycling", 0, &value))
-		value = 1;
-	color_cycling_enabled = value;
-	is_gamma_valid = TRUE;
 }
 
 void LoadPalette(char *pszFileName)

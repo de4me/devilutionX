@@ -30,6 +30,7 @@ SDL_Surface *renderer_texture_surface = nullptr;
 SDL_Surface *pal_surface;
 
 bool bufferUpdated = false;
+bool is_gamma_valid = false;
 
 void SaveWindow(){
 	if(window == NULL) return;
@@ -40,6 +41,25 @@ void SaveWindow(){
 	SDL_GetWindowSize(window, &frame.w, &frame.h);
 	SDL_GetWindowPosition(window, &frame.x, &frame.y);
 	PrefSetRect(kPrefWindowFrame, frame);
+}
+
+void SaveGamma(){
+	if(!is_gamma_valid) return;
+	PrefSetInt(kPrefGammaCorrection, gamma_correction);
+	PrefSetBool(kPrefColorCycling, color_cycling_enabled);
+}
+
+int NormalizeGamma(int gamma){
+	if(gamma>100) return GAMMA_NORMAL;
+	if(gamma<30) return 30;
+	return gamma;
+}
+
+void LoadGamma(){
+	int gamma = NormalizeGamma(PrefGetInt(kPrefGammaCorrection, GAMMA_NORMAL));
+	gamma_correction = gamma - gamma % 5;
+	color_cycling_enabled = PrefGetBool(kPrefColorCycling, true);
+	is_gamma_valid = true;
 }
 
 static void dx_create_back_buffer()
@@ -80,6 +100,7 @@ void dx_init(HWND hWnd)
 	SDL_RaiseWindow(window);
 	SDL_ShowWindow(window);
 
+	LoadGamma();
 	dx_create_primary_surface();
 	palette_init();
 	dx_create_back_buffer();
@@ -140,6 +161,7 @@ void dx_cleanup()
 	gpBuffer = NULL;
 	sgMemCrit.Leave();
 	SaveWindow();
+	SaveGamma();
 
 	if (pal_surface == nullptr)
 		return;
