@@ -40,6 +40,7 @@ void SaveWindow(){
 	SDL_Rect frame;
 	SDL_GetWindowSize(window, &frame.w, &frame.h);
 	SDL_GetWindowPosition(window, &frame.x, &frame.y);
+	if(SDL_RectEmpty(&frame)) return;
 	PrefSetRect(kPrefWindowFrame, frame);
 }
 
