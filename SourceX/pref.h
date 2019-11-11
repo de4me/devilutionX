@@ -9,6 +9,8 @@ extern const char* kPrefFullscreen;
 extern const char* kPrefGrabInput;
 extern const char* kPrefSoundVolume;
 extern const char* kPrefMusicVolume;
+extern const char* kPrefGammaCorrection;
+extern const char* kPrefColorCycling;
 
 /**
 Sets bool for a given value name.

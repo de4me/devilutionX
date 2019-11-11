@@ -14,9 +14,12 @@ const char* keyname = "devilutionx";
 const char* kPrefWindowFrame = "window_frame";
 const char* kPrefUpscale = "upscale";
 const char* kPrefFullscreen = "fullscreen";
-const char* kPrefGrabInput = "grab input";
+const char* kPrefGrabInput = "grab_input";
 const char* kPrefSoundVolume = "sound_volume";
 const char* kPrefMusicVolume = "music_volume";
+const char* kPrefGammaCorrection = "gamma_correction";
+const char* kPrefColorCycling = "color_cycling";
+
 
 bool PrefSetBool(const char* valuename, bool newValue){
 #ifdef __APPLE__
