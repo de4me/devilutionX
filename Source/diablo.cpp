@@ -37,7 +37,7 @@ int color_cycle_timer;
 
 /* rdata */
 
-BOOL fullscreen = TRUE;
+BOOL fullscreen = FALSE;
 #ifdef _DEBUG
 int showintrodebug = 1;
 int questdebug = -1;
