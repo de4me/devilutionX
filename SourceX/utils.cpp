@@ -3,7 +3,6 @@
 
 
 size_t path_copy(char* dst, size_t size, const char* src){
-	size = 20;
 	if(dst==NULL || size==0) return 0;
 	if(src==NULL) return 0;
 	size_t length = strlen(src);
