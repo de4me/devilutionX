@@ -266,6 +266,8 @@ set(devilutionx_SRCS
   SourceX/DiabloUI/ttf_render_wrapped.cpp
   SourceX/main.cpp
   SourceX/pref.cpp
+  SourceX/injection.cpp
+  SourceX/utils.cpp
   ./Packaging/macOS/AppIcon.icns
   ./Packaging/resources/CharisSILB.ttf)
 

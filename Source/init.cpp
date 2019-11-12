@@ -4,6 +4,7 @@
 #include "../DiabloUI/diabloui.h"
 #include <SDL.h>
 #include <config.h>
+#include "injection.h"
 
 DEVILUTION_BEGIN_NAMESPACE
 
@@ -88,14 +89,18 @@ void init_archives()
 
 HANDLE init_test_access(char *mpq_path, char *mpq_name, char *reg_loc, int dwPriority, int fs)
 {
-	char Buffer[2][MAX_PATH];
+	int count = 0;
+	char Buffer[3][MAX_PATH];
 	char *sdlPath;
 	HANDLE archive;
+	
+	if(path_copy(Buffer[count],sizeof(Buffer[0]),inj::data_path))
+		count++;
 
-	GetBasePath(Buffer[0], MAX_PATH);
-	GetPrefPath(Buffer[1], MAX_PATH);
+	GetBasePath(Buffer[count++], MAX_PATH);
+	GetPrefPath(Buffer[count++], MAX_PATH);
 
-	for (int i = 0; i < 2; i++) {
+	for (int i=0; i<count; i++) {
 		snprintf(mpq_path, MAX_PATH, "%s%s", Buffer[i], mpq_name);
 		if (SFileOpenArchive(mpq_path, dwPriority, MPQ_FLAG_READ_ONLY, &archive)) {
 			SFileSetBasePath(Buffer[i]);
