@@ -39,7 +39,7 @@ int color_cycle_timer;
 
 BOOL fullscreen = TRUE;
 #ifdef _DEBUG
-int showintrodebug = 1;
+int showintrodebug = false;
 int questdebug = -1;
 int debug_mode_key_s;
 int debug_mode_key_w;
