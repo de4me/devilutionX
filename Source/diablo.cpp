@@ -22,7 +22,7 @@ BOOL gbLoadGame;
 int DebugMonsters[10];
 BOOLEAN cineflag;
 int force_redraw;
-BOOL visiondebug;
+BOOL visiondebug = FALSE;
 BOOL scrollflag; /* unused */
 BOOL light4flag;
 BOOL leveldebug;
