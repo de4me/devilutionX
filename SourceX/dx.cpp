@@ -32,6 +32,20 @@ SDL_Surface *pal_surface;
 bool bufferUpdated = false;
 bool is_gamma_valid = false;
 
+bool CheckWindowFrame(const SDL_Rect* frame){
+	if(frame==NULL) return false;
+	if(SDL_RectEmpty(frame)) return false;
+	for(int i = 0; i<SDL_GetNumVideoDisplays(); i++){
+		SDL_Rect bounds;
+		if(SDL_GetDisplayBounds(i, &bounds)!=0) continue;
+		SDL_Rect intersects;
+		if(!SDL_IntersectRect(frame, &bounds, &intersects)) continue;
+		if(SDL_RectEquals(&intersects, &bounds)) continue;
+		return true;
+	}
+	return false;
+}
+
 void SaveWindow(){
 	if(window == NULL) return;
 	Uint32 flags = SDL_GetWindowFlags(window);
@@ -40,7 +54,7 @@ void SaveWindow(){
 	SDL_Rect frame;
 	SDL_GetWindowSize(window, &frame.w, &frame.h);
 	SDL_GetWindowPosition(window, &frame.x, &frame.y);
-	if(SDL_RectEmpty(&frame)) return;
+	if(!CheckWindowFrame(&frame)) return;
 	PrefSetRect(kPrefWindowFrame, frame);
 }
 
