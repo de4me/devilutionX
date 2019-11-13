@@ -432,7 +432,7 @@ static void DRLG_L3River()
 				rx = random_(0, DMAXX);
 				ry = random_(0, DMAXY);
 				i++;
-				while ((dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28) && ry < DMAXY) {
+				while (ry < DMAXY && (dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28)) {
 					rx++;
 					if (rx >= DMAXX) {
 						rx = 0;
@@ -1273,7 +1273,7 @@ static void DRLG_L3Wood()
 				}
 				if (rt == 1) {
 					x1 = i;
-					while (WoodHorizL(x1, j)) {
+					while ( x1>=0 && WoodHorizL(x1, j)) {
 						x1--;
 					}
 					x1++;

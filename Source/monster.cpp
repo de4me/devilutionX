@@ -655,7 +655,7 @@ void PlaceUniqueMonst(int uniqindex, int miniontype, int unpackfilesize)
 			}
 		}
 	}
-
+	if(xp>=MAXDUNX || yp>=MAXDUNY) return;
 	PlaceMonster(nummonsters, uniqtype, xp, yp);
 	Monst->_uniqtype = uniqindex + 1;
 
