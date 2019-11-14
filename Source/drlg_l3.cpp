@@ -428,7 +428,7 @@ static void DRLG_L3River()
 			rx = 0;
 			ry = 0;
 			i = 0;
-			while ((dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28) && i < 100) {
+			while (ry<DMAXY && i<100 && (dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28)) {
 				rx = random_(0, DMAXX);
 				ry = random_(0, DMAXY);
 				i++;
@@ -440,7 +440,7 @@ static void DRLG_L3River()
 					}
 				}
 			}
-			if (i >= 100) {
+			if (ry>=DMAXY || i>=100) {
 				return;
 			}
 			switch (dungeon[rx][ry]) {
@@ -974,6 +974,7 @@ static void DRLG_L3PlaceRndSet(const BYTE *miniset, int rndper)
 
 static BOOL WoodVertU(int i, int y)
 {
+	if(i+1>=DMAXX || i-1<0) return FALSE;
 	if ((dungeon[i + 1][y] > 152 || dungeon[i + 1][y] < 130)
 	    && (dungeon[i - 1][y] > 152 || dungeon[i - 1][y] < 130)) {
 		if (dungeon[i][y] == 7) {

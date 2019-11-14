@@ -725,6 +725,7 @@ void Theme_Library(int t)
 				AddObject(OBJ_BOOKSTAND, xp, yp);
 				if (random_(0, 2 * librnd[leveltype - 1]) != 0) {
 					oi = dObject[xp][yp] - 1;
+					if(oi<=0 || oi>=MAXOBJECTS) continue;
 					object[oi]._oSelFlag = 0;
 					object[oi]._oAnimFrame += 2;
 				}
