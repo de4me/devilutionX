@@ -29,7 +29,7 @@ BOOL leveldebug;
 BOOL monstdebug;
 BOOL trigdebug; /* unused */
 int setseed;
-int debugmonsttypes;
+int debugmonsttypes = 0;
 int PauseMode;
 int sgnTimeoutCurs;
 char sgbMouseDown;
