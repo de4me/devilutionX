@@ -4292,10 +4292,11 @@ void SyncObjectAnim(int o)
 	file = ObjFileList[0];
 	ofindex = AllObjects[object[o]._otype].ofindex;
 	i = 0;
-	while (file != ofindex) {
+	while (i+1<sizeof(ObjFileList) && file != ofindex) {
 		file = ObjFileList[i + 1];
 		i++;
 	}
+	if(i>=sizeof(pObjCels)/sizeof(pObjCels[0])) return;
 	object[o]._oAnimData = pObjCels[i];
 	switch (object[o]._otype) {
 	case OBJ_BOOK2R:

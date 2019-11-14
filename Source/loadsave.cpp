@@ -1693,7 +1693,7 @@ void LoadLevel()
 	dolighting = 1;
 
 	for (i = 0; i < MAX_PLRS; i++) {
-		if (plr[i].plractive && currlevel == plr[i].plrlevel)
+		if (plr[i].plractive && currlevel == plr[i].plrlevel && plr[i]._plid != -1 )
 			LightList[plr[i]._plid]._lunflag = 1;
 	}
 

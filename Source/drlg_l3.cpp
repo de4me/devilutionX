@@ -974,7 +974,7 @@ static void DRLG_L3PlaceRndSet(const BYTE *miniset, int rndper)
 
 static BOOL WoodVertU(int i, int y)
 {
-	if(i+1>=DMAXX || i-1<0) return FALSE;
+	if(i+1>=DMAXX || i-1<1) return FALSE;
 	if ((dungeon[i + 1][y] > 152 || dungeon[i + 1][y] < 130)
 	    && (dungeon[i - 1][y] > 152 || dungeon[i - 1][y] < 130)) {
 		if (dungeon[i][y] == 7) {
