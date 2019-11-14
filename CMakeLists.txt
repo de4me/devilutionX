@@ -266,6 +266,8 @@ set(devilutionx_SRCS
   SourceX/DiabloUI/ttf_render_wrapped.cpp
   SourceX/main.cpp
   SourceX/pref.cpp
+  SourceX/injection.cpp
+  SourceX/utils.cpp
   ./Packaging/macOS/AppIcon.icns
   ./Packaging/resources/CharisSILB.ttf)
 
@@ -279,7 +281,7 @@ endif()
 add_executable(devilutionx MACOSX_BUNDLE ${devilutionx_SRCS})
 
 configure_file(SourceS/config.h.in config.h @ONLY)
-target_include_directories(devilution PUBLIC Source SourceS ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(devilution PUBLIC Source SourceS SourceX ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(devilutionx PRIVATE
   SourceX
   3rdParty/asio/include

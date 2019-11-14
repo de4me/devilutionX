@@ -961,7 +961,7 @@ BOOL ItemSpaceOk(int i, int j)
 {
 	int oi;
 
-	if (i < 0 || i >= MAXDUNX || j < 0 || j >= MAXDUNY)
+	if (i < 0 || i+1 >= MAXDUNX || j < 0 || j+1 >= MAXDUNY)
 		return FALSE;
 
 	if (dMonster[i][j])

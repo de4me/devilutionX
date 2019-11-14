@@ -422,7 +422,7 @@ static void DRLG_L1Pass3()
 	}
 
 	yy = 16;
-	for (j = 0; j < DMAXY; j++) {
+	for (j = 0; yy<MAXDUNY && j < DMAXY; j++) {
 		xx = 16;
 		for (i = 0; i < DMAXX; i++) {
 			lv = dungeon[i][j] - 1;
@@ -556,8 +556,8 @@ void LoadL1Dungeon(char *sFileName, int vx, int vy)
 	rh = *lm;
 	lm += 2;
 
-	for (j = 0; j < rh; j++) {
-		for (i = 0; i < rw; i++) {
+	for (j = 0; j<DMAXY && j < rh; j++) {
+		for (i = 0; i<DMAXX && i < rw; i++) {
 			if (*lm != 0) {
 				dungeon[i][j] = *lm;
 				L5dflags[i][j] |= DLRG_PROTECTED;
@@ -604,8 +604,8 @@ void LoadPreL1Dungeon(char *sFileName, int vx, int vy)
 	rh = *lm;
 	lm += 2;
 
-	for (j = 0; j < rh; j++) {
-		for (i = 0; i < rw; i++) {
+	for (j = 0; j<DMAXY && j < rh; j++) {
+		for (i = 0; i<DMAXX && i < rw; i++) {
 			if (*lm != 0) {
 				dungeon[i][j] = *lm;
 				L5dflags[i][j] |= DLRG_PROTECTED;

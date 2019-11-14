@@ -924,9 +924,10 @@ void SetupObject(int i, int x, int y, int ot)
 	object[i]._ox = x;
 	object[i]._oy = y;
 	j = 0;
-	while (ObjFileList[j] != ofi) {
+	while (j<sizeof(ObjFileList) && ObjFileList[j] != ofi) {
 		j++;
 	}
+	if(j>=sizeof(pObjCels)/sizeof(pObjCels[0])) return;
 	object[i]._oAnimData = pObjCels[j];
 	object[i]._oAnimFlag = AllObjects[ot].oAnimFlag;
 	if (AllObjects[ot].oAnimFlag) {

@@ -29,7 +29,7 @@ BOOL leveldebug;
 BOOL monstdebug;
 BOOL trigdebug; /* unused */
 int setseed;
-int debugmonsttypes;
+int debugmonsttypes = 0;
 int PauseMode;
 int sgnTimeoutCurs;
 char sgbMouseDown;
@@ -39,7 +39,7 @@ int color_cycle_timer;
 
 BOOL fullscreen = FALSE;
 #ifdef _DEBUG
-int showintrodebug = 0;
+int showintrodebug = false;
 int questdebug = -1;
 int debug_mode_key_s;
 int debug_mode_key_w;

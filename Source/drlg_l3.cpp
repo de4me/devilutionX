@@ -428,11 +428,11 @@ static void DRLG_L3River()
 			rx = 0;
 			ry = 0;
 			i = 0;
-			while ((dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28) && i < 100) {
+			while (ry<DMAXY && i<100 && (dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28)) {
 				rx = random_(0, DMAXX);
 				ry = random_(0, DMAXY);
 				i++;
-				while ((dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28) && ry < DMAXY) {
+				while (ry < DMAXY && (dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28)) {
 					rx++;
 					if (rx >= DMAXX) {
 						rx = 0;
@@ -440,7 +440,7 @@ static void DRLG_L3River()
 					}
 				}
 			}
-			if (i >= 100) {
+			if (ry>=DMAXY || i>=100) {
 				return;
 			}
 			switch (dungeon[rx][ry]) {
@@ -974,6 +974,7 @@ static void DRLG_L3PlaceRndSet(const BYTE *miniset, int rndper)
 
 static BOOL WoodVertU(int i, int y)
 {
+	if(i+1>=DMAXX || i-1<0) return FALSE;
 	if ((dungeon[i + 1][y] > 152 || dungeon[i + 1][y] < 130)
 	    && (dungeon[i - 1][y] > 152 || dungeon[i - 1][y] < 130)) {
 		if (dungeon[i][y] == 7) {
@@ -1273,7 +1274,7 @@ static void DRLG_L3Wood()
 				}
 				if (rt == 1) {
 					x1 = i;
-					while (WoodHorizL(x1, j)) {
+					while ( x1>=0 && WoodHorizL(x1, j)) {
 						x1--;
 					}
 					x1++;
@@ -1711,8 +1712,8 @@ void LoadL3Dungeon(char *sFileName, int vx, int vy)
 	rh = *lm;
 	lm += 2;
 
-	for (j = 0; j < rh; j++) {
-		for (i = 0; i < rw; i++) {
+	for (j = 0; j<DMAXY && j < rh; j++) {
+		for (i = 0; i<DMAXX && i < rw; i++) {
 			if (*lm != 0) {
 				dungeon[i][j] = *lm;
 			} else {
@@ -1769,8 +1770,8 @@ void LoadPreL3Dungeon(char *sFileName, int vx, int vy)
 	rh = *lm;
 	lm += 2;
 
-	for (j = 0; j < rh; j++) {
-		for (i = 0; i < rw; i++) {
+	for (j = 0; j<DMAXY && j < rh; j++) {
+		for (i = 0; i<DMAXX && i < rw; i++) {
 			if (*lm != 0) {
 				dungeon[i][j] = *lm;
 			} else {
