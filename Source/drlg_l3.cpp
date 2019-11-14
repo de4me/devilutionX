@@ -440,7 +440,9 @@ static void DRLG_L3River()
 					}
 				}
 			}
-			if (ry>=DMAXY || i>=100) {
+			if(ry>=DMAXY)
+				continue;
+			if (i>=100) {
 				return;
 			}
 			switch (dungeon[rx][ry]) {
@@ -552,6 +554,8 @@ static void DRLG_L3River()
 					ry = py;
 				}
 			}
+			if(rx<2 || rx+2>=DMAXX) continue;
+			if(ry<2 || ry+2>=DMAXY) continue;
 			if (dir == 0 && dungeon[rx][ry - 1] == 10 && dungeon[rx][ry - 2] == 8) {
 				river[0][riveramt] = rx;
 				river[1][riveramt] = ry - 1;
@@ -975,6 +979,7 @@ static void DRLG_L3PlaceRndSet(const BYTE *miniset, int rndper)
 static BOOL WoodVertU(int i, int y)
 {
 	if(i+1>=DMAXX || i-1<1) return FALSE;
+	if(y>=DMAXY || y<0) return FALSE;
 	if ((dungeon[i + 1][y] > 152 || dungeon[i + 1][y] < 130)
 	    && (dungeon[i - 1][y] > 152 || dungeon[i - 1][y] < 130)) {
 		if (dungeon[i][y] == 7) {
