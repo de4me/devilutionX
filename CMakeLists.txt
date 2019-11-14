@@ -281,7 +281,7 @@ endif()
 add_executable(devilutionx MACOSX_BUNDLE ${devilutionx_SRCS})
 
 configure_file(SourceS/config.h.in config.h @ONLY)
-target_include_directories(devilution PUBLIC Source SourceS ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(devilution PUBLIC Source SourceS SourceX ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(devilutionx PRIVATE
   SourceX
   3rdParty/asio/include
