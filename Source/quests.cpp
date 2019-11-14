@@ -114,7 +114,7 @@ void InitQuests()
 	}
 #ifdef _DEBUG
 	if (questdebug != -1)
-		quests[questdebug]._qactive = 2;
+		quests[questdebug]._qactive = 1;
 #endif
 
 #ifdef SPAWN
