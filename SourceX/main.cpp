@@ -19,19 +19,19 @@ enum OPT_ID: int {
 	opt_key_inverted_v,
 	opt_key_b,
 	opt_key_d,
-	opt_show_fps,
+	opt_fps,
 	opt_disable_network_timeout,
 	opt_key_J_trigger,
 	opt_level,
-	opt_debug_monst,
-	opt_show_intro,
+	opt_monst,
+	opt_intro,
 	opt_quest,
-	opt_set_map,
+	opt_map,
 	opt_key_s,
 	opt_quest_level,
 	opt_vision,
 	opt_key_w,
-	opt_run_fullscreen,
+	opt_fullscreen,
 	opt_god_mode,
 	opt_path,
 	opt_help
@@ -46,25 +46,25 @@ const OPT_INFO options_array[] = {
 		{"--help", opt_help},
 		{"-h", opt_help},
 		{"-?", opt_help},
-		{"-fps", opt_show_fps},
-		{"-f", opt_show_fps},
-		{"-fullscreen", opt_run_fullscreen},
+		{"-fps", opt_fps},
+		{"-f", opt_fps},
+		{"-fullscreen", opt_fullscreen},
 		{"-path", opt_path},
 		{"-folder", opt_path},
 #if _DEBUG
 		{"-vision", opt_vision},
 		{"-v", opt_vision},
-		{"-intro", opt_show_intro},
+		{"-intro", opt_intro},
 		{"-gm", opt_god_mode},
 		{"-$", opt_god_mode},
 		{"-^", opt_key_inverted_v},
 		{"-d", opt_key_d},
-		{"-m", opt_debug_monst},
+		{"-m", opt_monst},
 		{"-w", opt_key_w},
 		{"-notimeout", opt_disable_network_timeout},
 		{"-i", opt_disable_network_timeout},
-		{"-map", opt_set_map},
-		{"-r", opt_set_map},
+		{"-map", opt_map},
+		{"-r", opt_map},
 		{"-quest", opt_quest},
 		{"-q", opt_quest},
 		{"-level", opt_level},
@@ -121,8 +121,8 @@ void print_help(){
 	printf("%s %s\n\n", PROJECT_NAME, PROJECT_VERSION);
 	printf("%s\n", "Supported options:");
 	print_option(opt_help, NULL, "This help;");
-	print_option(opt_show_fps, NULL , "Show fps;");
-	print_option(opt_run_fullscreen, NULL, "Run in fullscreen mode;");
+	print_option(opt_fps, NULL , "Show fps;");
+	print_option(opt_fullscreen, NULL, "Run in fullscreen mode;");
 	print_option(opt_path, "{path}", "Set search folder for diabdat.mpq file;");
 #ifdef _WIN32
 	printf("\n%s\n", "demo: DevilutionX.exe -fps -fullscreen -folder c:\\Users\\Me\\DevilutionX");
@@ -133,17 +133,17 @@ void print_help(){
 
 bool parse_flags(int argc, char * const *argv){
 	for(int i = 1; i<argc; i++){
-		int index = i + 1;
+		int next = i + 1;
 		switch (get_option(argv[i])) {
-			case opt_show_fps:
+			case opt_fps:
 				EnableFrameCount();
 				continue;
-			case opt_run_fullscreen:
+			case opt_fullscreen:
 				fullscreen = true;
 				continue;
 			case opt_path:
-				if(index>=argc) return true;
-				inj::data_path = argv[index];
+				if(next>=argc) return true;
+				inj::data_path = argv[next];
 				break;
 			case opt_help:
 				print_help();
@@ -155,7 +155,7 @@ bool parse_flags(int argc, char * const *argv){
 			case opt_key_w:
 				debug_mode_key_w = true;
 				continue;
-			case opt_show_intro:
+			case opt_intro:
 				showintrodebug = true;
 				continue;
 			case opt_god_mode:
@@ -171,24 +171,24 @@ bool parse_flags(int argc, char * const *argv){
 			case opt_disable_network_timeout:
 				debug_mode_key_i = true;
 				continue;
-			case opt_set_map:
-				if(index>=argc) return true;
-				if(!isdigit(*argv[index])) continue;
-				setseed = atoi(argv[index]);
+			case opt_map:
+				if(next>=argc) return true;
+				if(!isdigit(*argv[next])) continue;
+				setseed = atoi(argv[next]);
 				break;
-			case opt_debug_monst:
-				for(; index<argc && isdigit(*argv[index]); index++){
+			case opt_monst:
+				for(; next<argc && isdigit(*argv[next]); next++){
 					if(debugmonsttypes<int(sizeof(DebugMonsters)/sizeof(DebugMonsters[0])))
-						DebugMonsters[debugmonsttypes++] = atoi(argv[index]);
-					i = index;
+						DebugMonsters[debugmonsttypes++] = atoi(argv[next]);
+					i = next;
 				}
 				monstdebug = debugmonsttypes != 0;
 				continue;
 			case opt_level:
 			{
-				if(index>=argc) return true;
-				if(!isdigit(*argv[index])) continue;
-				int level = atoi(argv[index]);
+				if(next>=argc) return true;
+				if(!isdigit(*argv[next])) continue;
+				int level = atoi(argv[next]);
 				dungeon_type type = inj::dungeon_type_from_level(level);
 				if(type==DTYPE_NONE) break;
 				leveltype = type;
@@ -200,9 +200,9 @@ bool parse_flags(int argc, char * const *argv){
 			}
 			case opt_quest_level:
 			{
-				if(index>=argc) return true;
-				if(!isdigit(*argv[index])) continue;
-				int level = atoi(argv[index]);
+				if(next>=argc) return true;
+				if(!isdigit(*argv[next])) continue;
+				int level = atoi(argv[next]);
 				dungeon_type type = inj::dungeon_type_from_quest_level(level);
 				if(type==DTYPE_NONE) break;
 				setlvlnum = level;
@@ -214,9 +214,9 @@ bool parse_flags(int argc, char * const *argv){
 			}
 			case opt_quest:
 			{
-				if(index>=argc) return true;
-				if(!isdigit(*argv[index])) continue;
-				int current = atoi(argv[index]);
+				if(next>=argc) return true;
+				if(!isdigit(*argv[next])) continue;
+				int current = atoi(argv[next]);
 				for(size_t i=0;i<sizeof(questlist)/sizeof(questlist[0]); i++){
 					if(questlist[i]._qdtype==current){
 						currlevel = questlist[i]._qdlvl;
@@ -238,8 +238,8 @@ bool parse_flags(int argc, char * const *argv){
 //				debug_mode_key_b = true;
 				continue;
 			case opt_key_J_trigger:
-				if(index>=argc) return true;
-				if(!isdigit(*argv[index])) continue;
+				if(next>=argc) return true;
+				if(!isdigit(*argv[next])) continue;
 //				debug_mode_key_J_trigger = atoi(argv[i]);
 				break;
 			case opt_key_s:
@@ -249,7 +249,7 @@ bool parse_flags(int argc, char * const *argv){
 			default:
 				continue;
 		}
-		i = index;
+		i = next;
 	}
 	return true;
 }
