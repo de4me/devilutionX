@@ -244,10 +244,10 @@ WPARAM keystate_for_mouse(WPARAM ret)
 	return ret;
 }
 
-WINBOOL false_avail()
+WINBOOL false_avail(const char *name, int value)
 {
-	DUMMY_PRINT("return %s although event available", "false");
-	return false;
+	DUMMY_PRINT("Unhandled SDL event: %s %d", name, value);
+	return true;
 }
 
 void SetMouseLMBMessage(const SDL_Event &event, LPMSG lpMsg)
@@ -501,7 +501,7 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 	case SDL_KEYUP: {
 		int key = translate_sdl_key(e.key.keysym);
 		if (key == -1)
-			return false_avail();
+			return false_avail("SDL_KEYUP", key);
 		lpMsg->message = e.type == SDL_KEYDOWN ? DVL_WM_KEYDOWN : DVL_WM_KEYUP;
 		lpMsg->wParam = (DWORD)key;
 		// HACK: Encode modifier in lParam for TranslateMessage later
@@ -523,7 +523,7 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 			lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
 			lpMsg->wParam = keystate_for_mouse(DVL_MK_RBUTTON);
 		} else {
-			return false_avail();
+			return false_avail("SDL_MOUSEBUTTONDOWN", button);
 		}
 	} break;
 	case SDL_MOUSEBUTTONUP: {
@@ -537,22 +537,51 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 			lpMsg->lParam = (e.button.y << 16) | (e.button.x & 0xFFFF);
 			lpMsg->wParam = keystate_for_mouse(0);
 		} else {
-			return false_avail();
+			return false_avail("SDL_MOUSEBUTTONUP", button);
 		}
 	} break;
 #ifndef USE_SDL1
 #if SDL_VERSION_ATLEAST(2, 0, 4)
 	case SDL_AUDIODEVICEADDED:
+		return false_avail("SDL_AUDIODEVICEADDED", e.adevice.which);
 	case SDL_AUDIODEVICEREMOVED:
+		return false_avail("SDL_AUDIODEVICEREMOVED", e.adevice.which);
 	case SDL_KEYMAPCHANGED:
+		return false_avail("SDL_KEYMAPCHANGED", 0);
 #endif
 	case SDL_TEXTEDITING:
+		return false_avail("SDL_TEXTEDITING", e.edit.length);
 	case SDL_TEXTINPUT:
-		return false_avail();
+		return false_avail("SDL_TEXTINPUT", e.text.windowID);
 	case SDL_WINDOWEVENT:
-		if (e.window.event == SDL_WINDOWEVENT_CLOSE) {
+		switch (e.window.event) {
+		case SDL_WINDOWEVENT_HIDDEN:
+			// TODO stop rendering to minimize CPU usage (gbActive)
+			break;
+		case SDL_WINDOWEVENT_MINIMIZED:
+			// TODO pause
+			break;
+		case SDL_WINDOWEVENT_FOCUS_GAINED:
+		case SDL_WINDOWEVENT_TAKE_FOCUS:
+		case SDL_WINDOWEVENT_RESIZED:
+		case SDL_WINDOWEVENT_SIZE_CHANGED:
+		case SDL_WINDOWEVENT_MOVED:
+		case SDL_WINDOWEVENT_RESTORED:
+		case SDL_WINDOWEVENT_MAXIMIZED:
+		case SDL_WINDOWEVENT_LEAVE:
+		case SDL_WINDOWEVENT_FOCUS_LOST:
+			break;
+		case SDL_WINDOWEVENT_CLOSE:
 			lpMsg->message = DVL_WM_QUERYENDSESSION;
-		} else if (e.window.event == SDL_WINDOWEVENT_ENTER) {
+			break;
+		case SDL_WINDOWEVENT_SHOWN:
+			gbActive = true;
+			lpMsg->message = DVL_WM_PAINT;
+			break;
+		case SDL_WINDOWEVENT_EXPOSED:
+			lpMsg->message = DVL_WM_PAINT;
+			break;
+		case SDL_WINDOWEVENT_ENTER:
 			lpMsg->message = DVL_WM_MOUSEHOVER;
 			// Bug in SDL, SDL_WarpMouseInWindow doesn't emit SDL_MOUSEMOTION
 			// and SDL_GetMouseState gives previous location if mouse was
@@ -562,14 +591,15 @@ WINBOOL PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilter
 				MouseY = mouseWarpingY;
 				mouseWarping = false;
 			}
-		} else {
-			return false_avail();
+			break;
+		default:
+			return false_avail("SDL_WINDOWEVENT", e.window.event);
 		}
+
 		break;
 #endif
 	default:
-		DUMMY_PRINT("unknown SDL message 0x%X", e.type);
-		return false_avail();
+		return false_avail("unknown", e.type);
 	}
 	return true;
 }
