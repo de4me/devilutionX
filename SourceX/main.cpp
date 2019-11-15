@@ -131,36 +131,6 @@ void print_help(){
 #endif
 }
 
-dungeon_type dungeon_type_from_level(int level){
-	if(level>=1 && level<5)
-		return DTYPE_CATHEDRAL;
-	else if(level>=5 && level<9)
-		return DTYPE_CATACOMBS;
-	else if(level>=9 && level<13)
-		return DTYPE_CAVES;
-	else if(level>=13 && level<17)
-		return DTYPE_HELL;
-	return DTYPE_NONE;
-}
-
-dungeon_type dungeon_type_from_quest_level(int level){
-	switch (level) {
-		case SL_SKELKING:
-			return DTYPE_CATHEDRAL;
-		case SL_BONECHAMB:
-			return DTYPE_CATACOMBS;
-		case SL_MAZE:
-			//??
-			return DTYPE_NONE;
-		case SL_POISONWATER:
-			return DTYPE_CAVES;
-		case SL_VILEBETRAYER:
-			return DTYPE_CATHEDRAL;
-		default:
-			return DTYPE_NONE;
-	}
-}
-
 bool parse_flags(int argc, char * const *argv){
 	for(int i = 1; i<argc; i++){
 		int index = i + 1;
@@ -219,7 +189,7 @@ bool parse_flags(int argc, char * const *argv){
 				if(index>=argc) return true;
 				if(!isdigit(*argv[index])) continue;
 				int level = atoi(argv[index]);
-				dungeon_type type = dungeon_type_from_level(level);
+				dungeon_type type = inj::dungeon_type_from_level(level);
 				if(type==DTYPE_NONE) break;
 				leveltype = type;
 				currlevel = level;
@@ -233,7 +203,7 @@ bool parse_flags(int argc, char * const *argv){
 				if(index>=argc) return true;
 				if(!isdigit(*argv[index])) continue;
 				int level = atoi(argv[index]);
-				dungeon_type type = dungeon_type_from_quest_level(level);
+				dungeon_type type = inj::dungeon_type_from_quest_level(level);
 				if(type==DTYPE_NONE) break;
 				setlvlnum = level;
 				leveltype = type;
@@ -252,7 +222,7 @@ bool parse_flags(int argc, char * const *argv){
 						currlevel = questlist[i]._qdlvl;
 						leveltype = questlist[i]._qlvlt;
 						if(leveltype==DTYPE_NONE)
-							leveltype = dungeon_type_from_level(currlevel);
+							leveltype = inj::dungeon_type_from_level(currlevel);
 						if(leveltype==DTYPE_NONE) break;
 						printf("<<< active quest: %s >>>\n", questlist[i]._qlstr);
 						questdebug = current;
