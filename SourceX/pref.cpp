@@ -52,7 +52,7 @@ const char* PrefGetString(const char* valuename, char* buffer, unsigned int buff
 	if (!cf_value.isValid()) return defaultValue;
 	return CFStringGetCString(cf_value.object(), buffer, bufferLength, kCFStringEncodingUTF8) ? (const char*)buffer : defaultValue;
 #else
-	return SRegLoadString(keyname, valuename, 0, (char*)buffer, bufferLength) ? (const char*)buffer : defaultValue;
+	return getIniValue(keyname, valuename, (char*)buffer, (int)bufferLength) ? (const char*)buffer : defaultValue;
 #endif
 }
 
@@ -65,7 +65,8 @@ bool PrefSetString(const char* valuename, const char* newValue){
 	CFPreferencesSetAppValue(cf_key.object(), cf_string.object(), kCFPreferencesCurrentApplication);
 	return true;
 #else
-	return SRegSaveString(keyname, valuename, 0, (char*)newValue);
+	setIniValue(keyname, valuename, (char*)newValue);
+	return true;
 #endif
 }
 
