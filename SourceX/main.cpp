@@ -1,6 +1,5 @@
-#include <string>
+#include "cross_header.h"
 #include <SDL.h>
-
 #include "devilution.h"
 #include "injection.h"
 #include "config.h"
@@ -263,5 +262,5 @@ void quit(){
 int main(int argc, char **argv){
 	atexit(quit);
 	if(!parse_flags(argc, argv)) return 0;
-	return WinMain(NULL, NULL, "", 0);
+	return dvl::WinMain(NULL, NULL, "", 0);
 }

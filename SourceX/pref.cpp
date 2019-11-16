@@ -1,3 +1,4 @@
+#include "cross_header.h"
 #include "devilution.h"
 #include "pref.h"
 

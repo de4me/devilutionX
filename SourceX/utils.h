@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdio.h>
-
 /**
 	Copy path from src to dst. Add last path character to end if not exist.
 	@param dst Destination string
