@@ -163,8 +163,9 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 		flags |= SDL_WINDOW_INPUT_GRABBED;
 	}
 	
-	SDL_Rect frame = PrefGetRect(kPrefWindowFrame, {SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight});
-	window = SDL_CreateWindow(lpWindowName, frame.x, frame.y, frame.w, frame.h, flags);
+	SDL_Rect frame = {SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight};
+	SDL_Rect current = PrefGetRect(kPrefWindowFrame, frame);
+	window = SDL_CreateWindow(lpWindowName, current.x, current.y, current.w, current.h, flags);
 #endif
 	if (window == NULL) {
 		ErrSdl();
