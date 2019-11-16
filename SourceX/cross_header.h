@@ -5,7 +5,7 @@
 #ifdef _WIN32
 	#include <windows.h>
 #else
-	#import <string>
+	#include <string.h>
 #endif
 
 #ifdef _WIN32
