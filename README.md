@@ -1,21 +1,19 @@
-[![Downloads](https://img.shields.io/github/downloads/diasurgical/devilutionX/total.svg)](https://github.com/diasurgical/devilutionX/releases)
-[![github stars](https://img.shields.io/github/stars/diasurgical/devilutionX.svg)](https://github.com/diasurgical/devilutionX/stargazers)
+[![Downloads](https://img.shields.io/github/downloads/de4me/devilutionX/total.svg)](https://github.com/de4me/devilutionX/releases)
+[![github stars](https://img.shields.io/github/stars/de4me/devilutionX.svg)](https://github.com/de4me/devilutionX/stargazers)
 
 Status | Platform
 ---:| ---
-[![CircleCI](https://circleci.com/gh/diasurgical/devilutionX.svg?style=svg)](https://circleci.com/gh/diasurgical/devilutionX) | Linux 32bit & 64bit, Windows 32bit, SDL1
-[![Build Status](https://travis-ci.org/diasurgical/devilutionX.svg?branch=master)](https://travis-ci.org/diasurgical/devilutionX) | macOS 64bit
-[![Build status](https://ci.appveyor.com/api/projects/status/1a0jus2372qvksht?svg=true)](https://ci.appveyor.com/project/AJenbo/devilutionx) | Windows MSVC
-
-![Discord Channel](https://avatars3.githubusercontent.com/u/1965106?s=16&v=4) [Discord Chat Channel](https://discord.gg/aQBQdDe)
+[![Build status](https://ci.appveyor.com/api/projects/status/7yvnxh5nc0sfpeam?svg=true)](https://ci.appveyor.com/project/de4me/devilutionx-xcode) | macOS 64bit
+[![Build status](https://ci.appveyor.com/api/projects/status/s2ajkkpob9eisk3s?svg=true)](https://ci.appveyor.com/project/de4me/devilutionx-ubuntu) | Ubuntu 64bit
+[![Build status](https://ci.appveyor.com/api/projects/status/alluattmnjm0mmn7?svg=true)](https://ci.appveyor.com/project/de4me/devilutionx-msvc) | Windows MSVC 64bit
 
 # How To Play:
  - Copy diabdat.mpq from your CD, or GoG install folder, to the DevilutionX install folder ; Make sure it is all lowercase.
- - [Download DevilutionX](https://github.com/diasurgical/devilutionX/releases), or build from source
+ - [Download DevilutionX](https://github.com/de4me/devilutionX/releases), or build from source
  - Install [SDL2](https://www.libsdl.org/download-2.0.php) (including [SDL2_mixer](https://www.libsdl.org/projects/SDL_mixer/) and [SDL2_ttf](https://www.libsdl.org/projects/SDL_ttf/))
  - Run `./devilutionx`
 
-Please keep in mind that this is still being worked on and is missing parts of UI and some minor bugs, see [milestone 1](https://github.com/diasurgical/devilutionX/milestone/1) for a full list of known issues.
+Please keep in mind that this is still being worked on and is missing parts of UI and some minor bugs, see [milestone 1](https://github.com/de4me/devilutionX/milestone/1) for a full list of known issues.
 
 # Building from Source
 <details><summary>Linux</summary>
