@@ -5,7 +5,7 @@ Status | Platform
 ---:| ---
 [![Build status](https://ci.appveyor.com/api/projects/status/7yvnxh5nc0sfpeam?svg=true)](https://ci.appveyor.com/project/de4me/devilutionx-xcode) | macOS 64bit
 [![Build status](https://ci.appveyor.com/api/projects/status/s2ajkkpob9eisk3s?svg=true)](https://ci.appveyor.com/project/de4me/devilutionx-ubuntu) | Ubuntu 64bit
-[![Build status](https://ci.appveyor.com/api/projects/status/alluattmnjm0mmn7?svg=true)](https://ci.appveyor.com/project/de4me/devilutionx-msvc) | Windows MSVC 64bit
+[![Build status](https://ci.appveyor.com/api/projects/status/alluattmnjm0mmn7?svg=true)](https://ci.appveyor.com/project/de4me/devilutionx-msvc) | Windows 64bit
 
 # How To Play:
  - Copy diabdat.mpq from your CD, or GoG install folder, to the DevilutionX install folder ; Make sure it is all lowercase.
