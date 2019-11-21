@@ -1083,6 +1083,7 @@ void AddFenceDoors()
 	for (j = 0; j < DMAXY; j++) {
 		for (i = 0; i < DMAXX; i++) {
 			if (dungeon[i][j] == 7) {
+				if (i > 0 && i < DMAXX - 1)
 				if (dungeon[i - 1][j] <= 152 && dungeon[i - 1][j] >= 130
 				    && dungeon[i + 1][j] <= 152 && dungeon[i + 1][j] >= 130) {
 					dungeon[i][j] = 146;
@@ -1090,6 +1091,7 @@ void AddFenceDoors()
 				}
 			}
 			if (dungeon[i][j] == 7) {
+				if (j > 0 && j < DMAXY - 1)
 				if (dungeon[i][j - 1] <= 152 && dungeon[i][j - 1] >= 130
 				    && dungeon[i][j + 1] <= 152 && dungeon[i][j + 1] >= 130) {
 					dungeon[i][j] = 147;
@@ -1107,6 +1109,7 @@ void FenceDoorFix()
 	for (j = 0; j < DMAXY; j++) {
 		for (i = 0; i < DMAXX; i++) {
 			if (dungeon[i][j] == 146) {
+				if (i > 0 && i < DMAXX - 1)
 				if (dungeon[i + 1][j] > 152 || dungeon[i + 1][j] < 130
 				    || dungeon[i - 1][j] > 152 || dungeon[i - 1][j] < 130) {
 					dungeon[i][j] = 7;
@@ -1114,6 +1117,7 @@ void FenceDoorFix()
 				}
 			}
 			if (dungeon[i][j] == 146) {
+				if (i > 0 && i < DMAXX - 1)
 				if (dungeon[i + 1][j] != 130 && dungeon[i - 1][j] != 130
 				    && dungeon[i + 1][j] != 132 && dungeon[i - 1][j] != 132
 				    && dungeon[i + 1][j] != 133 && dungeon[i - 1][j] != 133
@@ -1126,6 +1130,7 @@ void FenceDoorFix()
 				}
 			}
 			if (dungeon[i][j] == 147) {
+				if (j > 0 && j < DMAXY - 1)
 				if (dungeon[i][j + 1] > 152 || dungeon[i][j + 1] < 130
 				    || dungeon[i][j - 1] > 152 || dungeon[i][j - 1] < 130) {
 					dungeon[i][j] = 7;
@@ -1133,6 +1138,7 @@ void FenceDoorFix()
 				}
 			}
 			if (dungeon[i][j] == 147) {
+				if (j > 0 && j < DMAXY - 1)
 				if (dungeon[i][j + 1] != 131 && dungeon[i][j - 1] != 131
 				    && dungeon[i][j + 1] != 132 && dungeon[i][j - 1] != 132
 				    && dungeon[i][j + 1] != 133 && dungeon[i][j - 1] != 133
