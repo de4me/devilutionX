@@ -47,35 +47,8 @@ void ApplyGamma(PALETTEENTRY *dst, const PALETTEENTRY *src, int n)
 	force_redraw = 255;
 }
 
-void SaveGamma()
-{
-	SRegSaveValue("Diablo", "Gamma Correction", 0, gamma_correction);
-	SRegSaveValue("Diablo", "Color Cycling", FALSE, color_cycling_enabled);
-}
-
-static void LoadGamma()
-{
-	int gamma_value;
-	int value;
-
-	value = gamma_correction;
-	if (!SRegLoadValue("Diablo", "Gamma Correction", 0, &value))
-		value = 100;
-	gamma_value = value;
-	if (value < 30) {
-		gamma_value = 30;
-	} else if (value > 100) {
-		gamma_value = 100;
-	}
-	gamma_correction = gamma_value - gamma_value % 5;
-	if (!SRegLoadValue("Diablo", "Color Cycling", 0, &value))
-		value = 1;
-	color_cycling_enabled = value;
-}
-
 void palette_init()
 {
-	LoadGamma();
 	memcpy(system_palette, orig_palette, sizeof(orig_palette));
 	CreatePalette();
 }
