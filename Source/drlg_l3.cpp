@@ -432,6 +432,7 @@ static void DRLG_L3River()
 				rx = random_(0, DMAXX);
 				ry = random_(0, DMAXY);
 				i++;
+				// BUGFIX: Move `ry < DMAXY` check before dungeon checks (fixed)
 				while (ry < DMAXY && (dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28)) {
 					rx++;
 					if (rx >= DMAXX) {
@@ -440,9 +441,10 @@ static void DRLG_L3River()
 					}
 				}
 			}
-			if(ry>=DMAXY)
+			// BUGFIX: Continue if `ry >= DMAXY` (fixed)
+			if (ry >= DMAXY)
 				continue;
-			if (i>=100) {
+			if (i >= 100) {
 				return;
 			}
 			switch (dungeon[rx][ry]) {
@@ -1279,12 +1281,14 @@ static void DRLG_L3Wood()
 				}
 				if (rt == 1) {
 					x1 = i;
-					while ( x1>=0 && WoodHorizL(x1, j)) {
+					// BUGFIX: Check `x1 >= 0` first (fixed)
+					while (x1 >= 0 && WoodHorizL(x1, j)) {
 						x1--;
 					}
 					x1++;
 					x2 = i;
-					while (WoodHorizR(x2, j)) {
+					// BUGFIX: Check `x2 < DMAXX` first (fixed)
+					while (x2 < DMAXX && WoodHorizR(x2, j)) {
 						x2++;
 					}
 					x2--;

@@ -106,7 +106,7 @@ static void scrollrt_draw_cursor_item()
 		return;
 	}
 
-	if (sgbControllerActive && !invflag && (!chrflag || plr[myplr]._pStatPts <= 0)) {
+	if (sgbControllerActive && pcurs != CURSOR_TELEPORT && !invflag && (!chrflag || plr[myplr]._pStatPts <= 0)) {
 		return;
 	}
 
@@ -840,12 +840,12 @@ static void DrawGame(int x, int y)
 	if (PANELS_COVER) {
 		if (chrflag || questlog) {
 			nSrcOff = SCREENXY(112, VIEWPORT_HEIGHT / 2 - 17);
-			nDstOff = SCREENXY(320, VIEWPORT_HEIGHT - 2);
-			wdt = (SCREEN_WIDTH - 320) / 2;
+			nDstOff = SCREENXY(SPANEL_WIDTH, VIEWPORT_HEIGHT - 2);
+			wdt = (SCREEN_WIDTH - SPANEL_WIDTH) / 2;
 		} else if (invflag || sbookflag) {
 			nSrcOff = SCREENXY(112, VIEWPORT_HEIGHT / 2 - 17);
 			nDstOff = SCREENXY(0, VIEWPORT_HEIGHT - 2);
-			wdt = (SCREEN_WIDTH - 320) / 2;
+			wdt = (SCREEN_WIDTH - SPANEL_WIDTH) / 2;
 		}
 	}
 

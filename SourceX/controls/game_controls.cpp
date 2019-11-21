@@ -47,6 +47,8 @@ bool GetGameAction(const SDL_Event &event, GameAction *action)
 {
 	const ControllerButtonEvent ctrl_event = ToControllerButtonEvent(event);
 	switch (ctrl_event.button) {
+	case ControllerButton::IGNORE:
+		return true;
 	case ControllerButton::AXIS_TRIGGERLEFT: // ZL (aka L2)
 		if (!ctrl_event.up)
 			*action = GameAction(GameActionType::USE_HEALTH_POTION);
@@ -64,9 +66,7 @@ bool GetGameAction(const SDL_Event &event, GameAction *action)
 	case ControllerButton::BUTTON_Y: // Top button
 		if (InGameMenu())
 			break; // Map to keyboard key
-		if (invflag)
-			*action = GameActionSendMouseClick { GameActionSendMouseClick::RIGHT, ctrl_event.up };
-		else if (!ctrl_event.up)
+		if (!ctrl_event.up)
 			*action = GameAction(GameActionType::SECONDARY_ACTION);
 		return true;
 	case ControllerButton::BUTTON_X: // Left button
@@ -123,22 +123,6 @@ bool GetGameAction(const SDL_Event &event, GameAction *action)
 #endif
 
 	return false;
-}
-
-bool ShouldSkipMovie(const SDL_Event &event)
-{
-	if (GetMenuAction(event) != MenuAction::NONE)
-		return true;
-	switch (event.type) {
-	case SDL_MOUSEBUTTONDOWN:
-	case SDL_MOUSEBUTTONUP:
-		return event.button.button == SDL_BUTTON_LEFT;
-	case SDL_KEYDOWN:
-	case SDL_KEYUP:
-		return true;
-	default:
-		return false;
-	}
 }
 
 MoveDirection GetMoveDirection()

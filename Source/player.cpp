@@ -3687,9 +3687,10 @@ void CheckPlrSpell()
 		return;
 	}
 
+	if (!sgbControllerActive) {
 	if (pcurs != CURSOR_HAND
 	    || (MouseY >= PANEL_TOP && MouseX >= PANEL_LEFT && MouseX <= RIGHT_PANEL) // inside main panel
-	    || ((chrflag || questlog) && MouseX < 320 && MouseY < SPANEL_HEIGHT) // inside left panel
+	    || ((chrflag || questlog) && MouseX < SPANEL_WIDTH && MouseY < SPANEL_HEIGHT) // inside left panel
 		|| ((invflag || sbookflag) && MouseX > RIGHT_PANEL && MouseY < SPANEL_HEIGHT) // inside right panel
 	        && rspell != SPL_HEAL
 	        && rspell != SPL_IDENTIFY
@@ -3697,6 +3698,7 @@ void CheckPlrSpell()
 	        && rspell != SPL_INFRA
 	        && rspell != SPL_RECHARGE) {
 		return;
+	}
 	}
 
 	addflag = FALSE;
