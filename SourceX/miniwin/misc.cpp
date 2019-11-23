@@ -7,7 +7,7 @@
 #include "controls/controller.h"
 #include "DiabloUI/diabloui.h"
 #include "DiabloUI/dialogs.h"
-#include "pref.h"
+#include "injection.h"
 
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
@@ -172,8 +172,7 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 		flags |= SDL_WINDOW_INPUT_GRABBED;
 	}
 	
-	SDL_Rect frame = {SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight};
-	SDL_Rect current = PrefGetRect(kPrefWindowFrame, frame);
+	SDL_Rect current = inj::LoadWindowFrame({SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, nWidth, nHeight});
 	window = SDL_CreateWindow(lpWindowName, current.x, current.y, current.w, current.h, flags);
 #endif
 	if (window == NULL) {
