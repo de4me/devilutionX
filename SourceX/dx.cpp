@@ -3,7 +3,7 @@
 #include "miniwin/ddraw.h"
 #include "miniwin/com_macro.h"
 #include <SDL.h>
-#include "pref.h"
+#include "injection.h"
 
 namespace dvl {
 
@@ -31,52 +31,6 @@ SDL_Surface *renderer_texture_surface = nullptr;
 SDL_Surface *pal_surface;
 
 bool bufferUpdated = false;
-bool is_gamma_valid = false;
-
-bool CheckWindowFrame(const SDL_Rect* frame){
-	if(frame==NULL) return false;
-	if(SDL_RectEmpty(frame)) return false;
-	for(int i = 0; i<SDL_GetNumVideoDisplays(); i++){
-		SDL_Rect bounds;
-		if(SDL_GetDisplayBounds(i, &bounds)!=0) continue;
-		SDL_Rect intersects;
-		if(!SDL_IntersectRect(frame, &bounds, &intersects)) continue;
-		if(SDL_RectEquals(&intersects, &bounds)) continue;
-		return true;
-	}
-	return false;
-}
-
-void SaveWindow(){
-	if(window == NULL) return;
-	Uint32 flags = SDL_GetWindowFlags(window);
-	if(flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_MAXIMIZED))
-		return;
-	SDL_Rect frame;
-	SDL_GetWindowSize(window, &frame.w, &frame.h);
-	SDL_GetWindowPosition(window, &frame.x, &frame.y);
-	if(!CheckWindowFrame(&frame)) return;
-	PrefSetRect(kPrefWindowFrame, frame);
-}
-
-void SaveGamma(){
-	if(!is_gamma_valid) return;
-	PrefSetInt(kPrefGammaCorrection, gamma_correction);
-	PrefSetBool(kPrefColorCycling, color_cycling_enabled);
-}
-
-int NormalizeGamma(int gamma){
-	if(gamma>100) return GAMMA_NORMAL;
-	if(gamma<30) return 30;
-	return gamma;
-}
-
-void LoadGamma(){
-	int gamma = NormalizeGamma(PrefGetInt(kPrefGammaCorrection, GAMMA_NORMAL));
-	gamma_correction = gamma - gamma % 5;
-	color_cycling_enabled = PrefGetBool(kPrefColorCycling, true);
-	is_gamma_valid = true;
-}
 
 static void dx_create_back_buffer()
 {
@@ -116,7 +70,7 @@ void dx_init(HWND hWnd)
 	SDL_RaiseWindow(window);
 	SDL_ShowWindow(window);
 
-	LoadGamma();
+	inj::LoadGamma();
 	dx_create_primary_surface();
 	palette_init();
 	dx_create_back_buffer();
@@ -176,8 +130,8 @@ void dx_cleanup()
 	sgdwLockCount = 0;
 	gpBuffer = NULL;
 	sgMemCrit.Leave();
-	SaveWindow();
-	SaveGamma();
+	inj::SaveWindowFrame(window);
+	inj::SaveGamma();
 
 	if (pal_surface == nullptr)
 		return;
