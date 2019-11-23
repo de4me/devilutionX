@@ -255,7 +255,6 @@ bool parse_flags(int argc, char * const *argv){
 
 void quit(){
 	init_cleanup();
-	SaveGamma();
 	SDL_Quit();
 }
 
