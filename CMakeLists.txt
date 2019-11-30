@@ -316,7 +316,7 @@ add_executable(${BIN_TARGET} MACOSX_BUNDLE ${devilutionx_SRCS})
 
 configure_file(SourceS/config.h.in config.h @ONLY)
 target_include_directories(devilution PUBLIC Source SourceS SourceX ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(devilutionx PRIVATE
+target_include_directories(${BIN_TARGET} PRIVATE
   SourceX
   3rdParty/asio/include
   3rdParty/Radon/Radon/include
@@ -410,7 +410,7 @@ foreach(
   endif()
 endforeach(def_name)
 
-foreach(target devilution devilutionx)
+foreach(target devilution ${BIN_TARGET})
   target_link_libraries(${target} PRIVATE ${EXTRA_LIBS})
   if(USE_SDL1)
     target_compile_definitions(${target} PRIVATE USE_SDL1)

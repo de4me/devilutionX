@@ -264,6 +264,9 @@ void quit(){
 
 int main(int argc, char **argv){
 	atexit(quit);
+	#ifdef __SWITCH__
+		switch_enable_network();
+	#endif
 	if(!parse_flags(argc, argv)) return 0;
 	return dvl::WinMain(NULL, NULL, "", 0);
 }
