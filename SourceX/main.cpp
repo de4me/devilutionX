@@ -1,5 +1,9 @@
 #include "cross_header.h"
 #include <SDL.h>
+#ifdef __SWITCH__
+#include "platform/switch/network.h"
+#endif
+
 #include "devilution.h"
 #include "injection.h"
 #include "config.h"

@@ -1,7 +1,7 @@
 [![Downloads](https://img.shields.io/github/downloads/de4me/devilutionX/total.svg)](https://github.com/de4me/devilutionX/releases)
 [![github stars](https://img.shields.io/github/stars/de4me/devilutionX.svg)](https://github.com/de4me/devilutionX/stargazers)
 
-Status | Platform
+Nightly builds | Platform
 ---:| ---
 [![Build status](https://ci.appveyor.com/api/projects/status/7yvnxh5nc0sfpeam?svg=true)](https://ci.appveyor.com/project/de4me/devilutionx-macos-mojave) | macOS Mojave 64bit
 [![Build status](https://ci.appveyor.com/api/projects/status/s2ajkkpob9eisk3s?svg=true)](https://ci.appveyor.com/project/de4me/devilutionx-ubuntu-18) | Ubuntu 18.04 64bit
@@ -131,6 +131,22 @@ Make sure to install the `C++ CMake tools for Windows` component for Visual Stud
 5. In case you need to select any paths to dependencies manually do this right in cmake-gui window.
 6. Press `Generate` and open produced `.sln` file using Visual Studio.
 7. Use build/debug etc. commands inside Visual Studio Solution like with any normal Visual Studio project.
+</details>
+
+<details><summary>Nintendo Switch</summary>
+Run:
+	
+```
+Packaging/switch/build.sh
+```
+
+This will install the [Switch devkit](https://switchbrew.org/wiki/Setting_up_Development_Environment) and build a DevilutionX Switch package. If you already have the devkit installed, or are on a non-Debian system, pass the the devkit path to the script like this:
+
+```
+DEVKITPRO=<path to devkit> Packaging/switch/build.sh
+```
+
+The nro-file will be generated in the build folder. Test with an emulator (RyuJinx) or real hardware.
 </details>
 
 <details><summary>Haiku</summary>
