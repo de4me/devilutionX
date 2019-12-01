@@ -1,5 +1,6 @@
 #include "cross_header.h"
 #include "injection.h"
+#include "config.h"
 
 using namespace dvl;
 
