@@ -96,6 +96,8 @@ HANDLE init_test_access(char *mpq_path, char *mpq_name, char *reg_loc, int dwPri
 	
 	if(path_copy(Buffer[count],sizeof(Buffer[0]),inj::data_path))
 		count++;
+	else if(inj::app_path(Buffer[count],sizeof(Buffer[0])))
+		count++;
 
 	GetBasePath(Buffer[count++], MAX_PATH);
 	GetPrefPath(Buffer[count++], MAX_PATH);
