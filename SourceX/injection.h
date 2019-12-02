@@ -11,6 +11,7 @@ using namespace dvl;
 namespace inj {
 
 extern const char* data_path;
+extern const char* base_path;
 
 /**
  Get dungeon_type for level
@@ -61,6 +62,15 @@ void LoadGamma();
  @return True if program can launch
 */
 bool parse_flags(int argc, char * const *argv);
+
+/**
+ Returns an absolute path in UTF-8 encoding to the application directory.
+ The return path will be guaranteed to end with a path separator.
+ @param dst Location of the destination string buffer
+ @param size Size of the destination string buffer in char units
+ @return The number of characters copied
+ */
+size_t app_path(char* dst, size_t size);
 
 }
 

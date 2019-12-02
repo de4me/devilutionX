@@ -2,10 +2,16 @@
 #include "injection.h"
 #include "config.h"
 
+#ifdef __APPLE__
+#include "mac_types.h"
+#include <dlfcn.h>
+#endif
+
 using namespace dvl;
 
 namespace inj {
 
+const char* base_path = NULL;
 const char* data_path = NULL;
 bool is_gamma_valid = false;
 
@@ -127,6 +133,8 @@ void print_help(){
 }
 
 bool parse_flags(int argc, char * const *argv){
+	if(argc == 0) return true;
+	base_path=argv[0];
 	for(int i = 1; i<argc; i++){
 		int next = i + 1;
 		switch (get_option(argv[i])) {
@@ -328,6 +336,45 @@ void LoadGamma(){
 	gamma_correction = gamma - gamma % 5;
 	color_cycling_enabled = PrefGetBool(kPrefColorCycling, true);
 	is_gamma_valid = true;
+}
+
+#ifdef __APPLE__
+
+URLObject OriginalPathForTranslocation(URLObject& url){
+	typedef Boolean (*SecIsTranslocatedURL)(CFURLRef, bool *, CFErrorRef *);
+	typedef CFURLRef __nullable (*SecCreateOriginalPathForURL)(CFURLRef, CFErrorRef *);
+	CFURLRef result = NULL;
+	void *handle = dlopen("/System/Library/Frameworks/Security.framework/Security", RTLD_LAZY);
+	if(!handle) { return url; }
+	SecIsTranslocatedURL IsTranslocatedURL = (SecIsTranslocatedURL) dlsym(handle, "SecTranslocateIsTranslocatedURL");
+	bool translocated;
+	if( IsTranslocatedURL!=NULL && IsTranslocatedURL(url.object(), &translocated, NULL ) && translocated ){
+		SecCreateOriginalPathForURL CreateOriginalPathForURL = (SecCreateOriginalPathForURL) dlsym(handle, "SecTranslocateCreateOriginalPathForURL");
+		if( CreateOriginalPathForURL!=NULL )
+			result = CreateOriginalPathForURL(url.object(), NULL);
+	}
+	dlclose(handle);
+	return result != NULL ? result : url;
+}
+
+#endif
+
+size_t app_path(char* dst, size_t size){
+#ifdef __APPLE__
+	BundleObject bundle = BundleObject::main();
+	if(!bundle.isValid()) return 0;
+	URLObject bundle_url = bundle.url();
+	if(!bundle_url.isValid()) return 0;
+	URLObject original_url = OriginalPathForTranslocation(bundle_url);
+	URLObject url = original_url.deletingLastPathComponent();
+	if(!url.isValid()) return 0;
+	StringObject string = url.path();
+	char buffer[MAX_PATH];
+	if(!string.getCString(buffer, sizeof(buffer))) return 0;
+	return path_copy(dst, size, buffer);
+#else
+	return path_delete_last_component(dst, size, inj::base_path);
+#endif
 }
 
 }
