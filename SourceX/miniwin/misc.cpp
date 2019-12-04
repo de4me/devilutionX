@@ -127,9 +127,8 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 
 #ifdef USE_SDL1
 	SDL_EnableUNICODE(1);
-#endif
-
 	InitController();
+#endif
 
 	bool upscale = PrefGetBool(kPrefUpscale, true);
 	fullscreen = PrefGetBool(kPrefFullscreen, fullscreen);
