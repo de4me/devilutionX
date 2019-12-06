@@ -135,7 +135,7 @@ Make sure to install the `C++ CMake tools for Windows` component for Visual Stud
 
 <details><summary>Nintendo Switch</summary>
 Run:
-	
+
 ```
 Packaging/switch/build.sh
 ```

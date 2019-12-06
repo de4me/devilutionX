@@ -127,13 +127,13 @@ void FindItemOrObject()
 
 	for (int xx = -1; xx < 2; xx++) {
 		for (int yy = -1; yy < 2; yy++) {
-			if (xx == 0 && yy == 0)
-				continue; // Ignore doorway so we don't get stuck behind barrels
 			if (dObject[mx + xx][my + yy] == 0)
 				continue;
 			int o = dObject[mx + xx][my + yy] > 0 ? dObject[mx + xx][my + yy] - 1 : -(dObject[mx + xx][my + yy] + 1);
 			if (object[o]._oSelFlag == 0)
 				continue;
+			if (xx == 0 && yy == 0 && object[o]._oDoorFlag)
+				continue; // Ignore doorway so we don't get stuck behind barrels
 			int newRotations = GetRotaryDistance(mx + xx, my + yy);
 			if (rotations < newRotations)
 				continue;
@@ -647,7 +647,16 @@ static const direction kFaceDir[3][3] = {
 	{ DIR_W, DIR_NW, DIR_SW },  // LEFT
 	{ DIR_E, DIR_NE, DIR_SE },  // RIGHT
 };
-
+static const int kOffsets[8][2] = {
+	{ 1, 1 },   // DIR_S
+	{ 0, 1 },   // DIR_SW
+	{ -1, 1 },  // DIR_W
+	{ -1, 0 },  // DIR_NW
+	{ -1, -1 }, // DIR_N
+	{ 0, -1 },  // DIR_NE
+	{ 1, -1 },  // DIR_E
+	{ 1, 0 },   // DIR_SE
+};
 void WalkInDir(MoveDirection dir)
 {
 	if (dir.x == MoveDirectionX::NONE && dir.y == MoveDirectionY::NONE) {
@@ -657,9 +666,15 @@ void WalkInDir(MoveDirection dir)
 	}
 
 	ClrPlrPath(myplr);
-	plr[myplr].walkpath[0] = kMoveToWalkDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
+	PATHNODE pPath = { 0 };
+	pPath.x = plr[myplr]._px;
+	pPath.y = plr[myplr]._py;
+	int pdir = kFaceDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
+	if (path_solid_pieces(&pPath, pPath.x + kOffsets[pdir][0], pPath.y + kOffsets[pdir][1])) {
+		plr[myplr].walkpath[0] = kMoveToWalkDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
+	}
 	plr[myplr].destAction = ACTION_NONE; // stop attacking, etc.
-	plr[myplr]._pdir = kFaceDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
+	plr[myplr]._pdir = pdir;
 }
 
 void Movement()
@@ -841,16 +856,6 @@ void UpdateSpellTarget()
 	pcursplr = -1;
 	pcursmonst = -1;
 
-	static const int kOffsets[8][2] = {
-		{ 1, 1 },   // DIR_S
-		{ 0, 1 },   // DIR_SW
-		{ -1, 1 },  // DIR_W
-		{ -1, 0 },  // DIR_NW
-		{ -1, -1 }, // DIR_N
-		{ 0, -1 },  // DIR_NE
-		{ 1, -1 },  // DIR_E
-		{ 1, 0 },   // DIR_SE
-	};
 	const auto &player = plr[myplr];
 	cursmx = player._px + kOffsets[player._pdir][0];
 	cursmy = player._py + kOffsets[player._pdir][1];
