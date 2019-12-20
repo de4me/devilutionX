@@ -349,6 +349,7 @@ void FindActor()
 
 int pcursmissile;
 int pcurstrig;
+int pcursquest;
 
 void FindTrigger()
 {
@@ -391,6 +392,19 @@ void FindTrigger()
 			cursmy = ty;
 			pcurstrig = i;
 		}
+
+		if (pcurstrig == -1) {
+			for (int i = 0; i < MAXQUESTS; i++) {
+				if (i == QTYPE_VB || currlevel != quests[i]._qlevel || quests[i]._qslvl == 0)
+					continue;
+				const int newDdistance = GetDistance(quests[i]._qtx, quests[i]._qty, 2);
+				if (newDdistance == 0)
+					continue;
+				cursmx = quests[i]._qtx;
+				cursmy = quests[i]._qty;
+				pcursquest = i;
+			}
+		}
 	}
 
 	if (pcursmonst != -1 || pcursplr != -1 || cursmx == -1 || cursmy == -1)
@@ -411,7 +425,7 @@ void Interact()
 		} else {
 			NetSendCmdParam1(true, CMD_RATTACKID, pcursmonst);
 		}
-	} else if (pcursplr != -1 && !FriendlyMode) {
+	} else if (leveltype != DTYPE_TOWN && pcursplr != -1 && !FriendlyMode) {
 		NetSendCmdParam1(true, plr[myplr]._pwtype == WT_RANGED ? CMD_RATTACKPID : CMD_ATTACKPID, pcursplr);
 	}
 }
@@ -695,12 +709,6 @@ void HotSpellMove(MoveDirection dir)
 	}
 }
 
-static const _walk_path kMoveToWalkDir[3][3] = {
-	// NONE      UP      DOWN
-	{ WALK_NONE, WALK_N, WALK_S }, // NONE
-	{ WALK_W, WALK_NW, WALK_SW },  // LEFT
-	{ WALK_E, WALK_NE, WALK_SE },  // RIGHT
-};
 static const direction kFaceDir[3][3] = {
 	// NONE      UP      DOWN
 	{ DIR_OMNI, DIR_N, DIR_S }, // NONE
@@ -719,21 +727,16 @@ static const int kOffsets[8][2] = {
 };
 void WalkInDir(MoveDirection dir)
 {
+	const int x = plr[myplr]._px;
+	const int y = plr[myplr]._py;
 	if (dir.x == MoveDirectionX::NONE && dir.y == MoveDirectionY::NONE) {
-		if (sgbControllerActive && plr[myplr].destAction == ACTION_NONE)
-			ClrPlrPath(myplr);
+		if (sgbControllerActive && plr[myplr].walkpath[0] != WALK_NONE && plr[myplr].destAction == ACTION_NONE)
+			NetSendCmdLoc(true, CMD_WALKXY, x, y);
 		return;
 	}
 
-	ClrPlrPath(myplr);
-	PATHNODE pPath = { 0 };
-	pPath.x = plr[myplr]._px;
-	pPath.y = plr[myplr]._py;
-	int pdir = kFaceDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
-	if (path_solid_pieces(&pPath, pPath.x + kOffsets[pdir][0], pPath.y + kOffsets[pdir][1])) {
-		plr[myplr].walkpath[0] = kMoveToWalkDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
-	}
-	plr[myplr].destAction = ACTION_NONE; // stop attacking, etc.
+	const int pdir = kFaceDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
+	NetSendCmdLoc(true, CMD_WALKXY, x + kOffsets[pdir][0], y + kOffsets[pdir][1]);
 	plr[myplr]._pdir = pdir;
 }
 
@@ -829,6 +832,7 @@ void plrctrls_after_check_curs_move()
 		pcursobj = -1;
 		pcursmissile = -1;
 		pcurstrig = -1;
+		pcursquest = -1;
 		cursmx = -1;
 		cursmy = -1;
 		if (!invflag) {
@@ -926,12 +930,26 @@ void UpdateSpellTarget()
 	cursmy = player._py + kOffsets[player._pdir][1];
 }
 
+/**
+ * @brief Try dropping item in all 9 possible places
+ */
+void TryDropItem()
+{
+	cursmx = plr[myplr].WorldX;
+	cursmy = plr[myplr].WorldY;
+	if (!DropItemBeforeTrig()) {
+		cursmx--; // Try to drop on the other side
+		cursmy++;
+		DropItemBeforeTrig();
+	}
+}
+
 void PerformSpellAction()
 {
 	if (invflag) {
 		int spl = plr[myplr]._pRSpell;
 		if (pcurs >= CURSOR_FIRSTITEM) {
-			DropItemBeforeTrig();
+			TryDropItem();
 			return;
 		}
 		if (spl != SPL_IDENTIFY && spl != SPL_REPAIR && spl != SPL_RECHARGE)
@@ -967,11 +985,29 @@ void PerformSpellAction()
 	CheckPlrSpell();
 }
 
+void CtrlUseInvItem()
+{
+	ItemStruct *Item;
+
+	if (pcursinvitem == -1)
+		return;
+
+	if (pcursinvitem <= INVITEM_INV_LAST)
+		Item = &plr[myplr].InvList[pcursinvitem - INVITEM_INV_FIRST];
+	else
+		Item = &plr[myplr].SpdList[pcursinvitem - INVITEM_BELT_FIRST];
+
+	if ((Item->_iMiscId == IMISC_SCROLLT || Item->_iMiscId == IMISC_SCROLL) && spelldata[Item->_iSpell].sTargeted) {
+		return;
+	}
+
+	UseInvItem(myplr, pcursinvitem);
+}
+
 void PerformSecondaryAction()
 {
 	if (invflag) {
-		if (pcursinvitem != -1)
-			UseInvItem(myplr, pcursinvitem);
+		CtrlUseInvItem();
 		return;
 	}
 
@@ -984,6 +1020,9 @@ void PerformSecondaryAction()
 		plr[myplr].destAction = ACTION_WALK;
 	} else if (pcurstrig != -1) {
 		MakePlrPath(myplr, trigs[pcurstrig]._tx, trigs[pcurstrig]._ty, true);
+		plr[myplr].destAction = ACTION_WALK;
+	} else if (pcursquest != -1) {
+		MakePlrPath(myplr, quests[pcursquest]._qtx, quests[pcursquest]._qty, true);
 		plr[myplr].destAction = ACTION_WALK;
 	}
 }
