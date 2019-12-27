@@ -52,6 +52,7 @@ const OPT_INFO options_array[] = {
 		{"-fullscreen", opt_fullscreen},
 		{"-path", opt_path},
 		{"-folder", opt_path},
+		{"--data-dir", opt_path},
 #if _DEBUG
 		{"-vision", opt_vision},
 		{"-v", opt_vision},
