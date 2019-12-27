@@ -17,25 +17,25 @@ bool is_gamma_valid = false;
 
 enum OPT_ID: int {
 	opt_unknown,
-	opt_key_inverted_v,
-	opt_key_b,
-	opt_key_d,
-	opt_fps,
-	opt_disable_network_timeout,
-	opt_key_J_trigger,
-	opt_level,
-	opt_monst,
-	opt_intro,
-	opt_quest,
-	opt_map,
+	opt_key_inverted_v,				//Enable god mode and debug tools
+	opt_key_b,						//Enable item drop log
+	opt_key_d,						//Increaased item drops
+	opt_fps,						//Display frames per second
+	opt_disable_network_timeout,	//Disable network timeout
+	opt_key_J_trigger,				//Init trigger at level
+	opt_level,						//Start in level
+	opt_monst,						//Add debug monster, up to 10 allowed
+	opt_intro,						//Show startup videos
+	opt_quest,						//Force a certain quest
+	opt_map,						//Set map seed
 	opt_key_s,
-	opt_quest_level,
-	opt_vision,
-	opt_key_w,
-	opt_fullscreen,
-	opt_god_mode,
-	opt_path,
-	opt_help
+	opt_quest_level,				//Set current quest level
+	opt_vision,						//Highlight visibility
+	opt_key_w,						//Enable cheats
+	opt_fullscreen,					//Run in fullscreen mode
+	opt_god_mode,					//Enable god mode
+	opt_path,						//Set search folder for diabdat.mpq file
+	opt_help						//Print help and exit
 };
 
 struct OPT_INFO{
