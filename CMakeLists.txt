@@ -292,8 +292,9 @@ set(devilutionx_SRCS
   SourceX/pref.cpp
   SourceX/injection.cpp
   SourceX/utils.cpp
-  ./Packaging/macOS/AppIcon.icns
-  ./Packaging/resources/CharisSILB.ttf)
+  Packaging/macOS/AppIcon.icns
+  Packaging/resources/CharisSILB.ttf
+  Packaging/windows/devilutionx.rc)
 
 if(NOT NONET)
   list(APPEND devilutionx_SRCS

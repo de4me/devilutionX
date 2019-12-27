@@ -280,8 +280,10 @@ void diablo_init()
 
 void diablo_splash()
 {
+#if DEBUG
 	if (!showintrodebug)
 		return;
+#endif
 
 	play_movie("gendata\\logo.smk", TRUE);
 #ifndef SPAWN
@@ -348,8 +350,10 @@ void diablo_parse_flags(int argc, char **argv)
 			if (basePath.back() != '/')
 				basePath += '/';
 #endif
+#if DEBUG
 		} else if (strcasecmp("-n", argv[i]) == 0) {
 			showintrodebug = 0;
+#endif
 		} else if (strcasecmp("-f", argv[i]) == 0) {
 			EnableFrameCount();
 		} else if (strcasecmp("-x", argv[i]) == 0) {
