@@ -312,7 +312,7 @@ if(SWITCH)
   set(BIN_TARGET devilutionx.elf)
 endif()
 
-add_executable(${BIN_TARGET} MACOSX_BUNDLE ${devilutionx_SRCS})
+add_executable(${BIN_TARGET} WIN32 MACOSX_BUNDLE ${devilutionx_SRCS})
 
 configure_file(SourceS/config.h.in config.h @ONLY)
 target_include_directories(devilution PUBLIC Source SourceS SourceX ${CMAKE_CURRENT_BINARY_DIR})
@@ -374,7 +374,6 @@ foreach(
   KBCTRL_BUTTON_LEFTSHOULDER
   KBCTRL_BUTTON_START
   KBCTRL_BUTTON_BACK
-  KBCTRL_MODIFIER_KEY
   KBCTRL_IGNORE_1
   JOY_AXIS_LEFTX
   JOY_AXIS_LEFTY

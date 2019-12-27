@@ -26,5 +26,5 @@ int main(int argc, char **argv){
 		switch_enable_network();
 	#endif
 	if(!inj::parse_flags(argc, argv)) return 0;
-	return dvl::WinMain(NULL, NULL, "", 0);
+	return dvl::WinMain(argc, argv);
 }

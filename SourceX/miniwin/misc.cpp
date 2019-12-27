@@ -63,26 +63,6 @@ int _strnicmp(const char *_Str1, const char *_Str2, size_t n)
 	return strncasecmp(_Str1, _Str2, n);
 }
 
-char *_itoa(int _Value, char *_Dest, int _Radix)
-{
-	switch (_Radix) {
-	case 8:
-		sprintf(_Dest, "%o", _Value);
-		break;
-	case 10:
-		sprintf(_Dest, "%d", _Value);
-		break;
-	case 16:
-		sprintf(_Dest, "%x", _Value);
-		break;
-	default:
-		UNIMPLEMENTED();
-		break;
-	}
-
-	return _Dest;
-}
-
 DWORD GetTickCount()
 {
 	return SDL_GetTicks();
@@ -91,14 +71,6 @@ DWORD GetTickCount()
 void Sleep(DWORD dwMilliseconds)
 {
 	SDL_Delay(dwMilliseconds);
-}
-
-WINBOOL GetComputerNameA(LPSTR lpBuffer, LPDWORD nSize)
-{
-	DUMMY();
-	strncpy(lpBuffer, "localhost", *nSize);
-	*nSize = strlen(lpBuffer);
-	return true;
 }
 
 WINBOOL DeleteFileA(LPCSTR lpFileName)
@@ -143,7 +115,7 @@ bool SpawnWindow(LPCSTR lpWindowName, int nWidth, int nHeight)
 	SDL_SetVideoMode(nWidth, nHeight, SDL1_VIDEO_MODE_BPP, flags);
 #else // RETROFW
 	// JZ4760 IPU scaler (e.g. on RG-300 v2/3) - automatic high-quality scaling.
-	if (access("/proc/jz/ipu_ratio", F_OK) == 0) {
+	if (access("/proc/jz/ipu", F_OK) == 0 || access("/proc/jz/ipu_ratio", F_OK) == 0) {
 		SDL_SetVideoMode(nWidth, nHeight, SDL1_VIDEO_MODE_BPP, flags);
 	} else {
 		// Other RetroFW devices have 320x480 screens with non-square pixels.

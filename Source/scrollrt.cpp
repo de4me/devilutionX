@@ -116,14 +116,14 @@ static void scrollrt_draw_cursor_item()
 	}
 
 	mx = MouseX - 1;
-	if (mx < 0) {
-		mx = 0;
+	if (mx < 0 - cursW - 1) {
+		return;
 	} else if (mx > SCREEN_WIDTH - 1) {
 		return;
 	}
 	my = MouseY - 1;
-	if (my < 0) {
-		my = 0;
+	if (my < 0 - cursH - 1) {
+		return;
 	} else if (my > SCREEN_HEIGHT - 1) {
 		return;
 	}
@@ -633,7 +633,7 @@ static void scrollrt_draw_dungeon(int sx, int sy, int dx, int dy, int eflag)
 	}
 
 	if (MissilePreFlag) {
-		DrawMissile(sx, sy, dx, dy, 1);
+		DrawMissile(sx, sy, dx, dy, TRUE);
 	}
 
 	if (light_table_index < lightmax && bDead != 0) {
@@ -668,7 +668,7 @@ static void scrollrt_draw_dungeon(int sx, int sy, int dx, int dy, int eflag)
 	if (dMonster[sx][sy] > 0) {
 		DrawMonsterHelper(sx, sy, 0, dx, dy, eflag);
 	}
-	DrawMissile(sx, sy, dx, dy, 0);
+	DrawMissile(sx, sy, dx, dy, FALSE);
 	DrawObject(sx, sy, dx, dy, 0);
 	DrawItem(sx, sy, dx, dy, 0);
 

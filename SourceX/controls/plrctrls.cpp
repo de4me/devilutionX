@@ -18,7 +18,6 @@ int speedspellcount = 0;
 bool InGameMenu()
 {
 	return stextflag > 0
-	    || questlog
 	    || helpflag
 	    || talkflag
 	    || qtextflag
@@ -119,6 +118,8 @@ void FindItemOrObject()
 			int newRotations = GetRotaryDistance(mx + xx, my + yy);
 			if (rotations < newRotations)
 				continue;
+			if (xx != 0 && yy != 0 && GetDistance(mx + xx, my + yy, 1) == 0)
+				continue;
 			rotations = newRotations;
 			pcursitem = i;
 			cursmx = mx + xx;
@@ -140,6 +141,8 @@ void FindItemOrObject()
 				continue; // Ignore doorway so we don't get stuck behind barrels
 			int newRotations = GetRotaryDistance(mx + xx, my + yy);
 			if (rotations < newRotations)
+				continue;
+			if (xx != 0 && yy != 0 && GetDistance(mx + xx, my + yy, 1) == 0)
 				continue;
 			rotations = newRotations;
 			pcursobj = o;
@@ -202,23 +205,27 @@ void FindRangedTarget()
 		if (!CanTargetMonster(mi))
 			continue;
 
+		const bool newCanTalk = CanTalkToMonst(mi);
+		if (pcursmonst != -1 && !canTalk && newCanTalk)
+			continue;
 		const int newDdistance = GetDistanceRanged(mx, my);
-		const int newCanTalk = CanTalkToMonst(mi);
-		if (pcursmonst != -1 && !canTalk && (newCanTalk || distance < newDdistance))
-			continue;
 		const int newRotations = GetRotaryDistance(mx, my);
-		if (pcursmonst != -1 && !canTalk && distance == newDdistance && rotations < newRotations)
-			continue;
+		if (pcursmonst != -1 && canTalk == newCanTalk) {
+			if (distance < newDdistance)
+				continue;
+			if (distance == newDdistance && rotations < newRotations)
+				continue;
+		}
 		distance = newDdistance;
 		rotations = newRotations;
-		pcursmonst = mi;
 		canTalk = newCanTalk;
+		pcursmonst = mi;
 	}
 }
 
 void FindMeleeTarget()
 {
-	bool visited[MAXDUNX][MAXDUNY] = { 0 };
+	bool visited[MAXDUNX][MAXDUNY] = { { 0 } };
 	int maxSteps = 25; // Max steps for FindPath is 25
 	int rotations;
 	bool canTalk;
@@ -258,13 +265,15 @@ void FindMeleeTarget()
 				if (dMonster[dx][dy] != 0) {
 					const int mi = dMonster[dx][dy] > 0 ? dMonster[dx][dy] - 1 : -(dMonster[dx][dy] + 1);
 					if (CanTargetMonster(mi)) {
-						const int newRotations = GetRotaryDistance(dx, dy);
 						const bool newCanTalk = CanTalkToMonst(mi);
-						if (pcursmonst != -1 && !canTalk && (newCanTalk || rotations < newRotations))
+						if (pcursmonst != -1 && !canTalk && newCanTalk)
+							continue;
+						const int newRotations = GetRotaryDistance(dx, dy);
+						if (pcursmonst != -1 && canTalk == newCanTalk && rotations < newRotations)
 							continue;
 						rotations = newRotations;
-						pcursmonst = mi;
 						canTalk = newCanTalk;
+						pcursmonst = mi;
 						if (!canTalk)
 							maxSteps = node.steps; // Monsters found, cap search to current steps
 					}
@@ -709,6 +718,23 @@ void HotSpellMove(MoveDirection dir)
 	}
 }
 
+void SpellBookMove(MoveDirection dir)
+{
+	DWORD ticks = GetTickCount();
+	if (ticks - invmove < repeatRate) {
+		return;
+	}
+	invmove = ticks;
+
+	if (dir.x == MoveDirectionX::LEFT) {
+		if (sbooktab > 0)
+			sbooktab--;
+	} else if (dir.x == MoveDirectionX::RIGHT) {
+		if (sbooktab < 3)
+			sbooktab++;
+	}
+}
+
 static const direction kFaceDir[3][3] = {
 	// NONE      UP      DOWN
 	{ DIR_OMNI, DIR_N, DIR_S }, // NONE
@@ -725,24 +751,78 @@ static const int kOffsets[8][2] = {
 	{ 1, -1 },  // DIR_E
 	{ 1, 0 },   // DIR_SE
 };
+
+/**
+ * @brief check if stepping in direction (dir) from x, y is blocked.
+ *
+ * If you step from A to B, at leat one of the Xs need to be clear:
+ *
+ *  AX
+ *  XB
+ *
+ *  @return true if step is blocked
+ */
+bool IsPathBlocked(int x, int y, int dir)
+{
+	int d1, d2, d1x, d1y, d2x, d2y;
+
+	switch (dir) {
+	case DIR_N:
+		d1 = DIR_NW;
+		d2 = DIR_NE;
+		break;
+	case DIR_E:
+		d1 = DIR_NE;
+		d2 = DIR_SE;
+		break;
+	case DIR_S:
+		d1 = DIR_SE;
+		d2 = DIR_SW;
+		break;
+	case DIR_W:
+		d1 = DIR_SW;
+		d2 = DIR_NW;
+		break;
+	default:
+		return false;
+	}
+
+	d1x = x + kOffsets[d1][0];
+	d1y = y + kOffsets[d1][1];
+	d2x = x + kOffsets[d2][0];
+	d2y = y + kOffsets[d2][1];
+
+	if (!nSolidTable[dPiece[d1x][d1y]] && !nSolidTable[dPiece[d2x][d2y]])
+		return false;
+
+	return !PosOkPlayer(myplr, d1x, d1y) && !PosOkPlayer(myplr, d2x, d2y);
+}
+
 void WalkInDir(MoveDirection dir)
 {
 	const int x = plr[myplr]._px;
 	const int y = plr[myplr]._py;
+
 	if (dir.x == MoveDirectionX::NONE && dir.y == MoveDirectionY::NONE) {
 		if (sgbControllerActive && plr[myplr].walkpath[0] != WALK_NONE && plr[myplr].destAction == ACTION_NONE)
-			NetSendCmdLoc(true, CMD_WALKXY, x, y);
+			NetSendCmdLoc(true, CMD_WALKXY, x, y); // Stop walking
 		return;
 	}
 
 	const int pdir = kFaceDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
-	NetSendCmdLoc(true, CMD_WALKXY, x + kOffsets[pdir][0], y + kOffsets[pdir][1]);
+	const int dx = x + kOffsets[pdir][0];
+	const int dy = y + kOffsets[pdir][1];
 	plr[myplr]._pdir = pdir;
+
+	if (PosOkPlayer(myplr, dx, dy) && IsPathBlocked(x, y, pdir))
+		return; // Don't start backtrack around obstacles
+
+	NetSendCmdLoc(true, CMD_WALKXY, dx, dy);
 }
 
 void Movement()
 {
-	if (InGameMenu())
+	if (InGameMenu() || questlog)
 		return;
 
 	MoveDirection move_dir = GetMoveDirection();
@@ -756,67 +836,73 @@ void Movement()
 		AttrIncBtnSnap(move_dir.y);
 	} else if (spselflag) {
 		HotSpellMove(move_dir);
+	} else if (sbookflag) {
+		SpellBookMove(move_dir);
 	} else {
 		WalkInDir(move_dir);
 	}
 }
 
 struct RightStickAccumulator {
-	void start(int *x, int *y)
+	void pool(int *x, int *y, int slowdown)
 	{
-		hiresDX += rightStickX * kGranularity;
-		hiresDY += rightStickY * kGranularity;
+		DWORD tc = SDL_GetTicks();
+		hiresDX += rightStickX * (tc - lastTc);
+		hiresDY += rightStickY * (tc - lastTc);
 		*x += hiresDX / slowdown;
 		*y += -hiresDY / slowdown;
-	}
-
-	void finish()
-	{
+		lastTc = tc;
 		// keep track of remainder for sub-pixel motion
 		hiresDX %= slowdown;
 		hiresDY %= slowdown;
 	}
 
-	static const int kGranularity = (1 << 15) - 1;
-	int slowdown; // < kGranularity
-	int hiresDX;
-	int hiresDY;
+	void clear()
+	{
+		lastTc = SDL_GetTicks();
+	}
+
+	DWORD lastTc = SDL_GetTicks();
+	int hiresDX = 0;
+	int hiresDY = 0;
 };
 
 } // namespace
 
 void HandleRightStickMotion()
 {
+	static RightStickAccumulator acc;
 	// deadzone is handled in ScaleJoystickAxes() already
-	if (rightStickX == 0 && rightStickY == 0)
+	if (rightStickX == 0 && rightStickY == 0) {
+		acc.clear();
 		return;
+	}
 
-	if (automapflag) { // move map
-		static RightStickAccumulator acc = { /*slowdown=*/(1 << 14) + (1 << 13), 0, 0 };
+	if (automapflag && currlevel != DTYPE_TOWN) { // move map
 		int dx = 0, dy = 0;
-		acc.start(&dx, &dy);
-		if (dy > 1)
-			AutomapUp();
-		else if (dy < -1)
-			AutomapDown();
-		else if (dx < -1)
-			AutomapRight();
-		else if (dx > 1)
-			AutomapLeft();
-		acc.finish();
-	} else { // move cursor
+		acc.pool(&dx, &dy, 32);
+		AutoMapXOfs += dy + dx;
+		AutoMapYOfs += dy - dx;
+		return;
+	}
+
+	{ // move cursor
 		sgbControllerActive = false;
-		static RightStickAccumulator acc = { /*slowdown=*/(1 << 13) + (1 << 12), 0, 0 };
 		int x = MouseX;
 		int y = MouseY;
-		acc.start(&x, &y);
-		if (x < 0)
-			x = 0;
-		if (y < 0)
-			y = 0;
+		acc.pool(&x, &y, 2);
+		x = std::min(std::max(x, 0), SCREEN_WIDTH - 1);
+		y = std::min(std::max(y, 0), SCREEN_HEIGHT - 1);
 		SetCursorPos(x, y);
-		acc.finish();
 	}
+}
+
+/**
+ * @brief Moves the mouse to the first inventory slot.
+ */
+void FocusOnInventory()
+{
+	SetCursorPos(InvRect[25].X + (INV_SLOT_SIZE_PX / 2), InvRect[25].Y - (INV_SLOT_SIZE_PX / 2));
 }
 
 void plrctrls_after_check_curs_move()
@@ -869,14 +955,12 @@ void UseBeltItem(int type)
 void PerformPrimaryAction()
 {
 	if (invflag) { // inventory is open
-		if (pcurs == CURSOR_IDENTIFY)
-			CheckIdentify(myplr, pcursinvitem);
-		else if (pcurs == CURSOR_REPAIR)
-			DoRepair(myplr, pcursinvitem);
-		else if (pcurs == CURSOR_RECHARGE)
-			DoRecharge(myplr, pcursinvitem);
-		else
+		if (pcurs > CURSOR_HAND && pcurs < CURSOR_FIRSTITEM) {
+			TryIconCurs();
+			SetCursor_(CURSOR_HAND);
+		} else {
 			CheckInvItem();
+		}
 		return;
 	}
 
@@ -926,45 +1010,56 @@ void UpdateSpellTarget()
 	pcursmonst = -1;
 
 	const auto &player = plr[myplr];
-	cursmx = player._px + kOffsets[player._pdir][0];
-	cursmy = player._py + kOffsets[player._pdir][1];
+
+	int range = 1;
+	if (plr[myplr]._pRSpell == SPL_TELEPORT)
+		range = 4;
+
+	cursmx = player._px + kOffsets[player._pdir][0] * range;
+	cursmy = player._py + kOffsets[player._pdir][1] * range;
 }
 
 /**
  * @brief Try dropping item in all 9 possible places
  */
-void TryDropItem()
+bool TryDropItem()
 {
-	cursmx = plr[myplr].WorldX;
+	cursmx = plr[myplr].WorldX + 1;
 	cursmy = plr[myplr].WorldY;
 	if (!DropItemBeforeTrig()) {
-		cursmx--; // Try to drop on the other side
-		cursmy++;
+		// Try to drop on the other side
+		cursmx = plr[myplr].WorldX;
+		cursmy = plr[myplr].WorldY + 1;
 		DropItemBeforeTrig();
 	}
+
+	return pcurs == CURSOR_HAND;
 }
 
 void PerformSpellAction()
 {
+	if (InGameMenu() || questlog || sbookflag)
+		return;
+
 	if (invflag) {
-		int spl = plr[myplr]._pRSpell;
-		if (pcurs >= CURSOR_FIRSTITEM) {
+		if (pcurs >= CURSOR_FIRSTITEM)
 			TryDropItem();
-			return;
+		else if (pcurs > CURSOR_HAND) {
+			TryIconCurs();
+			SetCursor_(CURSOR_HAND);
 		}
-		if (spl != SPL_IDENTIFY && spl != SPL_REPAIR && spl != SPL_RECHARGE)
-			return;
+		return;
 	}
+
+	if (pcurs >= CURSOR_FIRSTITEM && !TryDropItem())
+		return;
+	if (pcurs > CURSOR_HAND)
+		SetCursor_(CURSOR_HAND);
 
 	if (spselflag) {
 		SetSpell();
 		return;
 	}
-
-	if (InGameMenu())
-		return;
-	if (TryIconCurs())
-		return;
 
 	int spl = plr[myplr]._pRSpell;
 	if ((pcursplr == -1 && (spl == SPL_RESURRECT || spl == SPL_HEALOTHER))
@@ -1011,7 +1106,12 @@ void PerformSecondaryAction()
 		return;
 	}
 
-	if (pcursitem != -1 && pcurs == CURSOR_HAND) {
+	if (pcurs >= CURSOR_FIRSTITEM && !TryDropItem())
+		return;
+	if (pcurs > CURSOR_HAND)
+		SetCursor_(CURSOR_HAND);
+
+	if (pcursitem != -1) {
 		NetSendCmdLocParam1(true, CMD_GOTOAGETITEM, cursmx, cursmy, pcursitem);
 	} else if (pcursobj != -1) {
 		NetSendCmdLocParam1(true, CMD_OPOBJXY, cursmx, cursmy, pcursobj);
